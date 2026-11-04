@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://sanatsergej-cmyk.github.io/dom-za-leto/sitemap.xml

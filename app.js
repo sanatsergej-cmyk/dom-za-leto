@@ -1,8 +1,35 @@
+const routeFiles = {
+  '': 'index.html', projects: 'projects/index.html',
+  'project/89': 'projects/dom-89/index.html', 'project/110': 'projects/dom-110/index.html',
+  technology: 'technology/index.html', construction: 'construction/index.html',
+  equipment: 'equipment/index.html', configure: 'configure/index.html',
+  quiz: 'quiz/index.html', invest: 'invest/index.html', land: 'land/index.html'
+};
+const siteRoot = new URL('.', document.currentScript.src);
+function updateRouteLinks() {
+  for (const image of document.querySelectorAll('img[src]')) {
+    const key = image.getAttribute('src');
+    const metadata = window.DZL_IMAGES?.[key];
+    if (!metadata) continue;
+    image.width = metadata.width;
+    image.height = metadata.height;
+    image.srcset = metadata.srcset;
+    image.sizes = image.closest('.project-image') ? '(max-width: 600px) 90vw, 44vw' : '(max-width: 700px) 95vw, 70vw';
+  }
+
+  for (const anchor of document.querySelectorAll('a[href^="#/"]')) {
+    let route = anchor.getAttribute('href').slice(2);
+    if (route === 'move' || route === 'build') route = 'construction';
+    if (Object.hasOwn(routeFiles, route)) {
+      anchor.href = new URL(routeFiles[route], siteRoot).href;
+    }
+  }
+}
 const app=document.querySelector('#app');
-const projects=[{id:89,inside:'80,1',living:'29,2',price:'7,8',image:'original',name:'Больше жизни за городом'},{id:110,inside:'99,8',living:'32,9',price:'8,8',image:'evening',name:'Пространство для всей семьи'}];
+const projects=[{id:89,inside:'80,1',living:'29,2',price:'7,8',image:'house89-daylight',name:'Больше жизни за городом'},{id:110,inside:'99,8',living:'32,9',price:'8,8',image:'evening',name:'Пространство для всей семьи'}];
 const fine='Ценовой ориентир из материалов октября 2026 года. Предчистовая отделка и инженерия; без участка. Актуальная смета и точный состав требуют подтверждения.';
 const link=(to,text,cls='button')=>`<a class="${cls}" href="#/${to}">${text} <span>↗</span></a>`;
-const card=p=>`<article class="project"><a href="#/project/${p.id}"><div class="project-image"><img loading="lazy" src="assets/${p.image}.webp" alt="Архитектура дома ${p.id}"><span class="tag">${p.id===89?'Проект из материалов производителя':'Вариант отделки · визуализация'}</span></div></a><div class="project-body"><div class="project-title"><h3>Дом ${p.id}</h3><strong>${p.price} млн ₽*</strong></div><p>${p.name}</p><div class="specs"><span>${p.id} м² по внешнему контуру</span><span>3 спальни</span><span>2 санузла</span></div>${link('project/'+p.id,'Планировка и комплектация','text-link')}</div></article>`;
+const card=p=>`<article class="project"><a href="#/project/${p.id}"><div class="project-image"><img loading="lazy" src="assets/${p.image}.webp" alt="Архитектура дома ${p.id}"><span class="tag">${p.id===89?'Дневная визуализация проекта':'Вариант отделки · визуализация'}</span></div></a><div class="project-body"><div class="project-title"><h3>Дом ${p.id}</h3><strong>${p.price} млн ₽*</strong></div><p>${p.name}</p><div class="specs"><span>${p.id} м² по внешнему контуру</span><span>3 спальни</span><span>2 санузла</span></div>${link('project/'+p.id,'Планировка и комплектация','text-link')}</div></article>`;
 const steps=`<div class="steps">${[['01','Знакомимся с вашей задачей','Как живёт семья, что важно в доме и какой бюджет комфортен.'],['02','Проверяем участок','Подъезд, рельеф, ограничения, грунт и возможности подключения.'],['03','Согласуем проект и смету','Фиксируем комплектацию, изменения, этапы и условия начала работ.'],['04','Строим и показываем прогресс','Фотографии, отчёты по этапам и приёмка специалистами.']].map(s=>`<div class="step"><b>${s[0]}</b><h3>${s[1]}</h3><p>${s[2]}</p></div>`).join('')}</div>`;
 const callout=()=>`<section class="section"><div class="callout"><span class="eyebrow">Начнём с вашей идеи</span><h2>Дом начинается<br>с хороших вопросов.</h2><p>Расскажите об участке, семье и планах. Подбор займёт несколько шагов — вы увидите результат до передачи контактов.</p>${link('quiz','Подобрать свой дом')}</div></section>`;
 function heading(title,sub,tag='Дом для жизни'){return `<div class="page-heading"><a class="back" href="#/">← На главную</a><span class="eyebrow">${tag}</span><h1>${title}</h1><p>${sub}</p></div>`}
@@ -14,7 +41,7 @@ function invest(){return heading('У земли и капитала<br>есть 
 let answers=[],step=0;
 const questions=[['С чего вы начинаете?',['Есть участок','Выбираю проект дома','Нужна консультация по стройке','Рассматриваю инвестиции']],['Сколько пространства нужно?',['Компактный дом · 89 м²','Больше пространства · 110 м²','Хочу обсудить другой размер']],['Что для вас важнее всего?',['Общий бюджет','Удобная планировка','Локация и инфраструктура','Инженерия и комфорт']],['Когда планируете начать?',['В ближайшие 3 месяца','В течение года','Пока изучаю возможности']]];
 function quiz(){if(step>=questions.length){return `<section class="quiz"><span class="eyebrow">Ваш ориентир готов</span><h2>Хорошее начало<br>для предметного разговора.</h2><ul class="result-list">${answers.map((a,i)=>`<li><span>${questions[i][0]}</span><strong>${a}</strong></li>`).join('')}</ul><p>${answers[0]==='Рассматриваю инвестиции'?'Следующий шаг — отдельная инвестиционная модель с проверкой локации, расходов и сценария выхода.':'Следующий шаг — проверка участка и составление индивидуальной комплектации.'}</p><div class="note">Цена пока не рассчитана: неизвестны условия участка, основание и подключения. Бриф можно сохранить локально. В этой версии данные никуда не отправляются.</div><div class="quiz-actions"><button class="button" id="download">Скачать мой бриф ↓</button><a class="button outline" href="tel:+79787245424">Позвонить: +7 978 724-54-24</a><button class="button outline" id="restart">Пройти ещё раз</button>${link('projects','Посмотреть проекты','button outline')}</div></section>`}const q=questions[step];return `<section class="quiz"><span class="eyebrow">Подбор дома · шаг ${step+1} из ${questions.length}</span><div class="progress"><i style="width:${(step+1)*25}%"></i></div><h2>${q[0]}</h2><p>Выберите ближайший вариант. Детали обсудим на этапе индивидуального проекта.</p><div class="options">${q[1].map((x,i)=>`<button class="option" data-answer="${i}">${x} <span>↗</span></button>`).join('')}</div>${step?'<button class="button outline" id="back">← Назад</button>':'<p class="fine">Контакты для просмотра результата не нужны.</p>'}</section>`}
-function render(){let path=location.hash.slice(2)||'';app.innerHTML=path==='configure'?configure():path==='move'?construction():path==='construction'||path==='build'?construction():path==='equipment'?equipment():path==='projects'?catalog():path.startsWith('project/')?project(path.split('/')[1]):scenarios[path]?scenario(path):path==='technology'?technology():path==='invest'?invest():path==='quiz'?quiz():home();document.title=({projects:'Проекты домов',quiz:'Подбор дома',technology:'Технология заводских панелей',construction:'Этапы строительства',equipment:'Комплектации и инженерия',configure:'Собрать комплектацию'}[path]||'Строительство домов в Крыму')+' · Дом за лето'}
+function render(){let path=location.hash.startsWith('#/')?location.hash.slice(2):(document.body.dataset.route||'');app.innerHTML=path==='configure'?configure():path==='move'?construction():path==='construction'||path==='build'?construction():path==='equipment'?equipment():path==='projects'?catalog():path.startsWith('project/')?project(path.split('/')[1]):scenarios[path]?scenario(path):path==='technology'?technology():path==='invest'?invest():path==='quiz'?quiz():home();document.title=({projects:'Проекты домов',quiz:'Подбор дома',technology:'Технология заводских панелей',construction:'Этапы строительства',equipment:'Комплектации и инженерия',configure:'Собрать комплектацию'}[path]||'Строительство домов в Крыму')+' · Дом за лето';updateRouteLinks();}
 window.addEventListener('hashchange',()=>{render();window.scrollTo({top:0,behavior:"instant"})});
 document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;if(t.dataset.theme){document.body.dataset.theme=t.dataset.theme;document.querySelectorAll('[data-theme]').forEach(b=>{if(b.tagName==='BUTTON')b.setAttribute('aria-pressed',b===t)});}if(t.dataset.filter){document.querySelector('#catalog').innerHTML=projects.filter(p=>t.dataset.filter==='all'||p.id===+t.dataset.filter).map(card).join('');document.querySelectorAll('[data-filter]').forEach(b=>b.classList.toggle('active',b===t))}if(t.dataset.answer!==undefined){answers[step]=questions[step][1][+t.dataset.answer];step++;render()}if(t.id==='back'){step--;render()}if(t.id==='restart'){step=0;answers=[];render()}if(t.id==='download'){const text='Дом за лето — предварительный бриф\n\n'+answers.map((a,i)=>questions[i][0]+'\n'+a).join('\n\n')+'\n\nНе является расчётом стоимости. Подготовлено локально, без отправки данных.';const url=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='Дом-за-лето-бриф.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}});
 
