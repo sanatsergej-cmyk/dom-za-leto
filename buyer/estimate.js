@@ -29,14 +29,14 @@ function recalc(){
  let credit='Для платежа заполните сумму кредита, ставку и срок.';
  if(principal&&months&&data.rate!=='')credit='Ориентир ежемесячного аннуитетного платежа — '+money(rate===0?principal/months:principal*rate/(-Math.expm1(-months*Math.log1p(rate))))+'.';
  const lines=['Дом '+data.house+' м². Ориентир предчистовой готовности с инженерией по материалам октября 2026 года — '+money(base)+'.',...plots.map((v,i)=>'Участок '+['А','Б'][i]+': '+money(v.sum)+' по заполненным строкам. '+(v.missing.length?'Уточнить: '+v.missing.map(k=>labels[k]).join(', ')+'.':'Все три статьи оценены.')),'Выбран участок '+['А','Б'][selected]+'. Доступ техники: '+data[data.pick+'_road']+'.','Допработы: '+(data.extras===''?'уточнить':money(Number(data.extras)))+'.',...(decor?['Оформление: '+decor+'.']:[]),'Итого по заполненным строкам: '+money(total)+'.',outstanding.length?'До полной сметы уточнить: '+outstanding.join(', ')+'.':'Индивидуальную смету подтвердит подрядчик.',credit];
- brief='Дом за лето / предварительный расчёт\n'+lines.join('\n');
+ brief='Проект: Дом за лето\nТелефон: +7 978 724-54-24\nСайт: https://sanatsergej-cmyk.github.io/dom-za-leto/\n\nПредварительный расчёт\n'+lines.join('\n');
  result.replaceChildren();const strong=document.createElement('strong');strong.textContent=money(total)+' по заполненным строкам';result.append(strong);
  for(const line of lines){const el=document.createElement('p');el.textContent=line;result.append(el);}
  document.querySelector('#sms').href='sms:+79787245424?body='+encodeURIComponent('Добрый день. Хочу обсудить дом '+data.house+' м². Предварительный бюджет по заполненным строкам '+money(total)+'.');
 }
 form.addEventListener('input',recalc);recalc();
 document.getElementById('share').onclick=async()=>{if(!brief)return;try{if(navigator.share)await navigator.share({title:'Расчёт дома',text:brief});else{await navigator.clipboard.writeText(brief);document.querySelector('#notice').textContent='Бриф скопирован. Вставьте его в нужный чат Telegram или MAX.';}}catch(e){if(e.name!=='AbortError')document.querySelector('#notice').textContent='Скачайте бриф и приложите файл к сообщению.';}};
-document.getElementById('save').onclick=()=>{if(!brief)return;const url=URL.createObjectURL(new Blob([brief],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='Расчёт-дома.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+document.getElementById('save').onclick=()=>{if(!brief)return;const url=URL.createObjectURL(new Blob(['\ufeff',brief],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='Расчёт-дома.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 for(const [channel,host,label] of [['telegram','t.me','Telegram'],['max','max.ru','MAX']]){
  const value=window.DZL_CHANNELS?.[channel];
  if(!value)continue;

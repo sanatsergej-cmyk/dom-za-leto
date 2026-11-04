@@ -1,3 +1,4 @@
+import './knowledge.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
@@ -32,6 +33,7 @@ function links(html) {
     mapping[route] ? 'href="' + base + mapping[route].replace(/index.html$/, '') + '"' : match);
 }
 const images = JSON.parse(read('scripts/images.json'));
+const knowledge = JSON.parse(read('content/knowledge.json'));
 function media(html) {
   return html.replace(/<img\b[^>]*>/g, tag => {
     const source = tag.match(/src="([^"]+)"/)?.[1];
@@ -64,7 +66,14 @@ function seo(file, title, description, article = false) {
   };
   const graph = {'@context': 'https://schema.org', '@graph': [
     organization, {'@type': 'WebSite', '@id': base+'#website', url: base, name: 'Дом за лето'},
-    entity, breadcrumb
+    entity, breadcrumb,
+    ...(file === 'buyer/questions.html' ? [{
+      '@type': 'FAQPage',
+      mainEntity: knowledge.questions.map(item => ({
+        '@type': 'Question', name: item.question,
+        acceptedAnswer: {'@type': 'Answer', text: item.answer}
+      }))
+    }] : [])
   ]};
   return '<link rel="canonical" href="'+url+'">'+
     '<meta property="og:type" content="'+(article?'article':'website')+'">'+
@@ -114,7 +123,7 @@ for (const file of fs.readdirSync(path.join(root,'buyer')).filter(name=>name.end
   // Buyer assets remain relative to their own directory.
   html = html.replace('src="assets/logo.webp"', 'src="../assets/logo.webp"');
   if(!html.includes('unified.css')) html = html.replace('</head>','<link rel="stylesheet" href="../unified.css"></head>');
-  html = html.replace('</head>',seo(relative,title,description,!['index.html','estimate.html'].includes(file))+'</head>');
+  html = html.replace('</head>',seo(relative,title,description,!['index.html','estimate.html','questions.html','crimea.html'].includes(file))+'</head>');
   write(relative,html);
   urls.push(base+relative.replace(/index.html$/,''));
 }
