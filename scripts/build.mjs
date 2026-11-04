@@ -127,6 +127,19 @@ for (const file of fs.readdirSync(path.join(root,'buyer')).filter(name=>name.end
   write(relative,html);
   urls.push(base+relative.replace(/index.html$/,''));
 }
+{
+  const file = 'invest/rental/index.html';
+  const title = 'Арендный дом на 4, 6 или 8 секций в Крыму';
+  const description = 'Двух- и трёхэтажные концепции под общей крышей, варианты площадей и запрос индивидуального инвестиционного предложения.';
+  let html = template.replace('<head>', '<head><base href="../../">');
+  html = html.replace('<main id="app"></main>', '<main>'+read('scripts/rental-content.html')+'</main>');
+  html = html.replace(/<script src="app.js[^"]*" defer><\/script>/, '<script src="buyer/channels.js" defer></script><script src="rental.js?v=1" defer></script>');
+  html = html.replace(/<title>.*?<\/title>/, '<title>'+title+' · Дом за лето</title>');
+  html = html.replace(/<meta name="description" content="[^"]*">/, '<meta name="description" content="'+description+'">');
+  html = html.replace('</head>',seo(file,title,description)+'</head>');
+  write(file,media(links(html)));
+  urls.push(base+'invest/rental/');
+}
 write('sitemap.xml','<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+urls.map(url=>'<url><loc>'+url+'</loc></url>').join('')+'</urlset>');
 write('robots.txt','User-agent: *\nAllow: /\nSitemap: '+base+'sitemap.xml\n');
 write('.nojekyll','');
