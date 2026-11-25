@@ -192,3 +192,38 @@ th,td{padding:.7rem 1rem;text-align:left;border-bottom:1px solid var(--line)}
 .build-backdrop::after{z-index:3;pointer-events:none}
 .build-nav{z-index:4}
 .request-note{font-size:.88rem;color:var(--muted)}
+
+@font-face{font-family:"EB Garamond";src:url("assets/type/eb.woff2") format("woff2");font-style:normal;font-weight:500;font-display:swap}
+@font-face{font-family:"Golos Text";src:url("assets/type/golos.woff2") format("woff2");font-style:normal;font-weight:400 900;font-display:swap}
+:root{--ink:#16382b;--dark:#112c22;--paper:#f7f3e9;--accent:#dfc08a;--display:"EB Garamond",Georgia,serif;font-family:"Golos Text",system-ui,sans-serif}
+h1,h2,h3,.spec-strip strong,.tool legend{font-family:var(--display);font-weight:500;letter-spacing:-.025em}
+.top{min-height:5.8rem}
+.brand img{width:3.55rem;height:3.55rem}
+.brand b{font-family:var(--display);font-size:1.8rem;font-weight:500;line-height:1;white-space:nowrap}
+.home-editorial{background:#e9e3d2;color:var(--ink)}
+.home-editorial h1{font-size:clamp(4rem,8.2vw,9.5rem);letter-spacing:-.046em}
+.home-editorial figure img{object-position:center}
+.home-routes{border-top:1px solid #d8ceb8}
+.chapter-note{background:#112c22e6;max-width:32rem}
+.chapter-note h2{font-size:clamp(2.6rem,5.6vw,5.9rem)}
+.build-frame{object-position:55% 52%}
+.compact-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.compact-options article{padding:1.25rem;border:1px solid var(--line);background:var(--card)}
+.quiz-selection{color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:.55rem}
+.foot{grid-template-columns:minmax(16rem,1fr) 1.6fr;align-items:start;padding-block:clamp(2rem,5vw,4rem);border-top:3px solid #b99658}
+.foot .foot-brand{gap:.55rem}
+.foot .foot-brand .brand{width:max-content}
+.foot .foot-brand img{width:4.8rem;height:4.8rem;background:var(--paper);border-radius:.1rem}
+.foot .foot-brand b{font-size:2.4rem}
+.foot .foot-brand p{color:#e9dfc7;margin:0}
+.foot nav{justify-content:flex-end;align-items:start}
+.foot .foot-bottom{grid-column:1/-1;display:flex;justify-content:space-between;gap:1rem;border-top:1px solid #6c775d;padding-top:1rem;margin-top:1rem;color:#e9dfc7;font-size:.86rem}
+@media(max-width:740px){
+  .top .brand img{width:2.6rem;height:2.6rem}
+  .top .brand b{font-size:1.45rem}
+  .home-editorial h1{font-size:clamp(3.8rem,12vw,5.5rem)}
+  .foot{grid-template-columns:1fr}
+  .foot nav{justify-content:flex-start}
+  .foot .foot-bottom{display:grid}
+}
+@media(max-width:460px){.compact-options{grid-template-columns:1fr}}

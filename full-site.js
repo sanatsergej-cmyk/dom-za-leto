@@ -168,7 +168,14 @@ if (quiz) {
   const back = quiz.querySelector('[data-back]');
   const result = quiz.querySelector('[data-quiz-result]');
   const progress = quiz.querySelector('[data-progress]');
-  const storeKey = 'dzl-quiz-v2';
+  const selection = quiz.querySelector('[data-quiz-selection]');
+  const requested = params.get('model');
+  const initialModels = {'89':'Дом 89','110':'Дом 110','8x8':'Дом 64 м²'};
+  if (Object.hasOwn(initialModels,requested)) {
+    selection.textContent = `Выбранный проект · ${initialModels[requested]}`;
+    selection.hidden = false;
+  }
+  const storeKey = 'dzl-quiz-v3:' + (Object.hasOwn(initialModels, requested) ? requested : 'general');
   let saved = {};
   try {saved = JSON.parse(sessionStorage.getItem(storeKey)||'{}')||{};} catch {}
   for (const input of quiz.querySelectorAll('[name]')) {
@@ -211,10 +218,9 @@ if (quiz) {
   function showResult() {
     const data = values();
     const rental = data.units==='5'?'5':data.units==='6'?'6':'4m';
-    const requested = params.get('model');
     const home = data.bedrooms==='2'?'8x8':data.feature==='privacy'?'110':data.bedrooms==='3'&&requested==='8x8'?'89':['89','110','8x8'].includes(requested)?requested:'89';
     const recommendations = [];
-    if (data.goal!=='rent') recommendations.push([`projects/dom-${home}/`,`Дом ${home==='8x8'?'8 × 8':home}`]);
+    if (data.goal!=='rent') recommendations.push([`projects/dom-${home}/`,`Дом ${home==='8x8'?'64 м²':home}`]);
     if (data.goal==='rent'||data.goal==='mixed') recommendations.push([`invest/projects/dd-${rental}/`,'Подходящая концепция доходного дома']);
     else recommendations.push(home==='89'?['projects/dom-110/','Сравнить с Домом 110']:['projects/dom-89/','Сравнить с Домом 89']);
     result.replaceChildren(paragraph('Посмотрите планировки и уточните готовность по своему бюджету.'));
@@ -225,7 +231,7 @@ if (quiz) {
       list.append(li);
     }
     result.append(list);
-    const selected = data.goal==='rent' ? `ДД-${rental}` : home;
+    const selected = data.goal==='rent' ? `ДД-${rental}` : initialModels[home];
     const briefLabels = {goal:'Цель',land:'Статус участка',location:'Кадастровый номер или адрес',region:'Район',landBudget:'Бюджет на участок',landArea:'Площадь участка',landNeeds:'Подъезд и сети',bedrooms:'Спальни',feature:'Приоритет',units:'Арендные единицы',rentType:'Тип аренды',operator:'Управление',finish:'Готовность',budget:'Бюджет на дом',pay:'Оплата',when:'Срок'};
     const answerLabels = {living:'Постоянное проживание',seasonal:'Дача',rent:'Аренда',mixed:'Комбинированно',unknown:'Пока выбираю',owned:'Свой участок',review:'Есть вариант',search:'Нужен подбор',cash:'Свои средства',mortgage:'Ипотека',terrace:'Терраса',privacy:'Санузел при спальне'};
     const note = ['Подбор дома','Здравствуйте! Хочу обсудить строительство.',`Ориентир проекта: ${selected}`,...Object.entries(data).filter(([,value])=>value).map(([key,value])=>`${briefLabels[key]}: ${answerLabels[value]||value}`)];
@@ -253,6 +259,7 @@ if (quiz) {
     steps[step]?.querySelector('select,input')?.focus();
   });
   back.addEventListener('click',()=>{if (step>0)step--;render();});
+  if (!control(quiz,'goal').value && Object.hasOwn(initialModels,requested)) choose(control(quiz,'goal'),'living');
   branches();
   render();
 }
