@@ -1,10 +1,11 @@
 import './knowledge.mjs';
+import { buildFullSite } from './full-site.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 
 const root = path.resolve(import.meta.dirname, '..');
-const base = 'https://sanatsergej-cmyk.github.io/dom-za-leto/';
+const base = new URL('./', (process.env.DZL_SITE_URL || 'https://sanatsergej-cmyk.github.io/dom-za-leto/').replace(/\/?$/, '/')).href;
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const write = (file, text) => {
   fs.mkdirSync(path.dirname(path.join(root, file)), { recursive: true });
@@ -28,9 +29,9 @@ const entries = [
 ];
 const mapping = Object.fromEntries(entries.map(([route, file]) => [route, file]));
 mapping.build = mapping.move = 'construction/index.html';
-function links(html) {
+function links(html, prefix = '') {
   return html.replace(/href="#\/([^"]*)"/g, (match, route) =>
-    mapping[route] ? 'href="' + base + mapping[route].replace(/index.html$/, '') + '"' : match);
+    mapping[route] ? 'href="' + prefix + mapping[route] + '"' : match);
 }
 const images = JSON.parse(read('scripts/images.json'));
 const knowledge = JSON.parse(read('content/knowledge.json'));
@@ -108,8 +109,8 @@ for (const [route, file, title, description] of entries) {
   write(file,html);
 }
 const urls = entries.map(([,file]) => base+file.replace(/index.html$/,''));
-const header = links(template.match(/<header>.*?<\/header>/s)[0]);
-const footer = links(template.match(/<footer>.*?<\/footer>/s)[0]);
+const header = links(template.match(/<header>.*?<\/header>/s)[0], '../');
+const footer = links(template.match(/<footer>.*?<\/footer>/s)[0], '../');
 for (const file of fs.readdirSync(path.join(root,'buyer')).filter(name=>name.endsWith('.html'))) {
   const relative = 'buyer/'+file;
   let html = read(relative);
@@ -118,10 +119,11 @@ for (const file of fs.readdirSync(path.join(root,'buyer')).filter(name=>name.end
   html = html.replace(/<link rel="canonical"[^>]*>/g,'')
     .replace(/<meta property="og:[^>]*>/g,'')
     .replace(/<script type="application\/ld\+json">.*?<\/script>/gs,'');
-  html = html.replace(/<header>.*?<\/header>/s, header.replaceAll('href="buyer/', 'href="'+base+'buyer/'));
-  html = html.replace(/<footer>.*?<\/footer>/s, footer.replaceAll('href="buyer/', 'href="'+base+'buyer/'));
+  html = html.replace(/<header>.*?<\/header>/s, header.replaceAll('href="buyer/', 'href="../buyer/').replace('href="mortgage/index.html"','href="../mortgage/index.html"'));
+  html = html.replace(/<footer>.*?<\/footer>/s, footer.replaceAll('href="buyer/', 'href="../buyer/'));
   // Buyer assets remain relative to their own directory.
   html = html.replace('src="assets/logo.webp"', 'src="../assets/logo.webp"');
+  html = html.replaceAll('href="invest/rental/"', 'href="../invest/rental/index.html"');
   if(!html.includes('unified.css')) html = html.replace('</head>','<link rel="stylesheet" href="../unified.css"></head>');
   html = html.replace('</head>',seo(relative,title,description,!['index.html','estimate.html','questions.html','crimea.html'].includes(file))+'</head>');
   write(relative,html);
@@ -139,6 +141,10 @@ for (const file of fs.readdirSync(path.join(root,'buyer')).filter(name=>name.end
   html = html.replace('</head>',seo(file,title,description)+'</head>');
   write(file,media(links(html)));
   urls.push(base+'invest/rental/');
+}
+for (const route of buildFullSite({write, seo, escape})) {
+  const url = base + route;
+  if (!urls.includes(url)) urls.push(url);
 }
 write('sitemap.xml','<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+urls.map(url=>'<url><loc>'+url+'</loc></url>').join('')+'</urlset>');
 write('robots.txt','User-agent: *\nAllow: /\nSitemap: '+base+'sitemap.xml\n');
