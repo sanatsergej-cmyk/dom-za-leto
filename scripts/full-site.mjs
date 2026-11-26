@@ -44,7 +44,7 @@ const book = [
 const entries = [];
 const add = (file,title,description,body,{script='',indexable=true}={}) => entries.push({file,title,description,body,script,indexable});
 const e = (name) => `assets/editorial/${name}`;
-const buildFilm = e('build-route.mp4?v=1');
+const buildFilm = e('build-route.mp4?v=2');
 const buildStages = [
   ['Дом 89',0,'Свой дом в предгорьях','Три спальни, кухня-гостиная 29,2 м² и выход во двор. Так выглядит Дом 89 в одном из вариантов отделки.','80,1 м² полезной площади','projects/dom-89/#floor-plan','Посмотреть план дома'],
   ['Участок',2.6,'Выбираем место для дома','Смотрим, где будут свет, вид из окон и удобный вход. До покупки участка проверяем подъезд крана, рельеф и расстояние до сетей.','Посадка дома, въезд и будущая терраса','land/search/','Подобрать участок'],
@@ -59,8 +59,8 @@ const scene = `<section class="build-story" id="stages" aria-label="Маршру
   <div class="build-run">
     <div class="build-backdrop">
       <div class="build-visual">
-        <video class="build-video" data-video-src="${buildFilm}" data-video-small="${e('build-route-compact.mp4?v=1')}" poster="assets/house89-daylight-1100.webp" preload="none" muted playsinline disablepictureinpicture aria-hidden="true"></video>
-        <canvas class="build-sequence" width="360" height="240" data-frames="${e('build-route-frames.webp?v=1')}" aria-hidden="true" hidden></canvas>
+        <video class="build-video" data-video-src="${buildFilm}" data-video-small="${e('build-route-compact.mp4?v=2')}" poster="assets/house89-daylight-1100.webp" preload="none" muted playsinline disablepictureinpicture aria-hidden="true"></video>
+        <canvas class="build-sequence" width="360" height="240" data-frames="${e('build-route-frames.webp?v=2')}" aria-hidden="true" hidden></canvas>
       </div>
       <span class="build-film-credit">Дом 89 · проектная визуализация</span>
     </div>
@@ -150,7 +150,7 @@ add('index.html','Частные, доходные и гостевые дома 
     <span class="flagship-status" role="status"></span>
   </section>
   ${scene}
-  <section class="band home-projects"><div class="home-section-heading"><div><p class="tag">Каталог</p><h2>Наши дома</h2></div><a href="objects/">Проекты и фото строительства ↗</a></div>${houseCards()}</section>
+  <section class="band home-projects"><div class="home-section-heading"><div><p class="tag">Каталог</p><h2>Наши дома</h2></div><div class="buttons"><a href="configure/?stage=interior">Выбрать интерьер ↗</a><a href="objects/">Проекты и фото строительства ↗</a></div></div>${houseCards()}</section>
   ${rentalAndGuest}
   ${landscapeCard}
   ${section('Почему заводские панели',advantages)}
@@ -161,7 +161,7 @@ for(const [id,h] of Object.entries(assets)) {
   add(`projects/dom-${id}/index.html`,`Дом ${id}`,h.desc,lead('Проект дома',`Дом ${id}`,`${h.area} м² внутри. ${h.desc}`,action(`quiz/?model=${id}`,'Рассчитать для участка'))+
     `<div class="wide-media">${image('assets/'+h.photo,'Фасадный визуал из архива проекта',true)}</div>`+
     section('Планировка',`<div class="project-plan"${id==='89'?' id="floor-plan"':''}><a class="plan" href="assets/${h.plan}">${image('assets/'+h.plan,`Планировка Дома ${id} из КП`)}</a><div class="plan-copy"><p class="tag">План из КП</p><h3>${h.area} м² внутри</h3><p>${h.desc}</p><p>${id} м² — наружный габарит проекта.</p>${action(`quiz/?model=${id}`,'Подобрать комплектацию')}</div></div>`)+
-    section('От комплекта до отделки',`<p>Согласуйте состав готовности, инженерию и доплаты по участку.</p>${action(`equipment/?model=${id}#package-tool`,'Сравнить комплектации')} ${action(`mortgage/dom-${id}/`,'Рассчитать ипотеку')}`)+
+    section('От комплекта до отделки',`<p>Согласуйте состав готовности, инженерию и отделку под проект.</p><div class="buttons">${action(`equipment/?model=${id}#package-tool`,'Сравнить комплектации')} ${action(`configure/?model=${id}&amp;stage=interior`,'Выбрать интерьер','outline')} ${action(`mortgage/dom-${id}/`,'Рассчитать ипотеку','outline')}</div>`)+
     section('Как проходит стройка',`<p>Сначала проверяем участок и условия монтажа. Затем согласуем проект, состав работ и график.</p>${action('construction/','Посмотреть этапы')}`)+(id==='89'?scene:''),{script:id==='89'?'build-scene.js':''});
 }
 add('projects/dom-8x8/index.html','Дом 64 м² · Заходи и живи','Компактный одноэтажный дом с двумя спальнями, террасой и вариантом пристройки.',lead('Концепция · 64 м² по габариту','Дом 64 м²','Две спальни и кухня-гостиная в одноэтажном доме. Основа — квадрат 8 × 8 м. Террасу можно предусмотреть отдельным этапом.', action('quiz/?model=8x8','Обсудить планировку'))+

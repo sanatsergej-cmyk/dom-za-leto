@@ -105,6 +105,7 @@ for (const [route, file, title, description] of entries) {
   html = html.replace(/<title>.*?<\/title>/, '<title>'+escape(title)+' · Дом за лето</title>');
   html = html.replace(/<meta name="description" content="[^"]*">/, '<meta name="description" content="'+escape(description)+'">');
   html = html.replace('</head>', seo(file,title,description)+'</head>');
+  if (route === 'configure') html = html.replace(/app\.js\?v=[^"]+/, 'app.js?v=interior1');
   html = media(links(html));
   write(file,html);
 }
