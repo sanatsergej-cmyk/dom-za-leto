@@ -227,3 +227,50 @@ h1,h2,h3,.spec-strip strong,.tool legend{font-family:var(--display);font-weight:
 .estimate-callout .tool .sales-points{grid-template-columns:repeat(auto-fit,minmax(min(10.5rem,100%),1fr))}
 .estimate-callout .tool output{margin:.3rem 0}
 @media(max-width:740px){.estimate-callout{grid-template-columns:1fr}}
+
+/* Keep the catalogue navigation and contact actions in separate groups. */
+.top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:.65rem clamp(.8rem,1.6vw,1.55rem);padding: .65rem clamp(1.1rem,3vw,3.8rem);min-height:0}
+.top .brand{justify-self:start}
+.top .brand img{width:clamp(5rem,7.6vw,7.25rem);height:auto}
+.top nav{display:flex;align-items:center;justify-content:center;gap:clamp(.45rem,1.15vw,1.15rem);flex-wrap:nowrap;font-size:clamp(.82rem,1.05vw,1rem);width:auto;order:0}
+.top nav a{white-space:nowrap}
+.top-actions{display:grid;justify-items:end;gap:.35rem;justify-content:end}
+.top-contact{display:flex;align-items:baseline;gap:.6rem;white-space:nowrap;font-size:.8rem}
+.top-contact .top-phone{font-size:.96rem}
+.top-contact a:last-child{text-decoration:underline;text-underline-offset:.22rem}
+.top-cta{font-size:.9rem;line-height:1.2;padding:.65rem .8rem}
+@media(max-width:1110px){
+  .top{grid-template-columns:1fr auto;gap:.45rem 1rem}
+  .top nav{grid-column:1/-1;grid-row:2;flex-wrap:wrap;justify-content:flex-start;padding-top:.55rem;border-top:1px solid var(--line)}
+}
+@media(max-width:460px){
+  .top{padding-inline:.8rem}
+  .top-contact{font-size:.72rem}
+  .top-contact .top-phone,.top-cta{font-size:.79rem}
+  .top nav{font-size:.8rem;gap:.4rem .65rem}
+}
+
+.quiz-page{padding-block:clamp(1.15rem,3vw,2.6rem)}
+.quiz-page h1{font-size:clamp(2.65rem,5.45vw,5.6rem);margin:0 0 .55em}
+.quiz-layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(17.5rem,1fr);gap:clamp(.85rem,2.8vw,2.15rem);align-items:start}
+.quiz-layout .tool{max-width:none;padding:clamp(1.1rem,2.25vw,1.85rem)}
+.quiz-layout .tool fieldset{margin:.65rem 0;padding:.2rem 0 .65rem}
+.quiz-layout .tool legend{font-size:clamp(1.65rem,3vw,2.5rem);margin-bottom:.7rem}
+.quiz-layout [data-progress]{margin:.1rem 0 .65rem}
+.quiz-answers{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(10.5rem,100%),1fr));gap:.55rem;margin-bottom:.7rem}
+.quiz-answer{background:#fbf8f0;border:1px solid #c4b9a0;border-radius:2px;padding:.7rem .75rem;min-height:3rem;text-align:left;color:var(--ink);line-height:1.28;cursor:pointer}
+.quiz-answer:hover,.quiz-answer[aria-pressed="true"]{background:#e9dec5;border-color:#8c7950}
+.quiz-answer[aria-pressed="true"]{box-shadow:inset 0 0 0 1px #8c7950}
+.quiz-answer-caption{font-size:.87rem;font-weight:650;margin:0 0 .3rem}
+.quiz-layout [data-next]:disabled{opacity:.5;cursor:default}
+.quiz-projects{border:1px solid var(--line);background:var(--card)}
+.quiz-projects>img{width:100%;aspect-ratio:16/10;object-fit:cover}
+.quiz-projects>div{padding:1rem 1.2rem 1.25rem}
+.quiz-projects h2{font-size:clamp(1.65rem,2.6vw,2.65rem);margin-bottom:.25rem}
+.quiz-projects p{margin:.15rem 0 .75rem}
+.quiz-model-links{display:flex;flex-wrap:wrap;gap:.5rem}
+.quiz-model-links a{padding:.45rem .65rem;border:1px solid #bfb294;text-decoration:none}
+.quiz-model-links a:hover{background:#e9dec5}
+@media(max-width:790px){.quiz-layout{grid-template-columns:1fr}.quiz-projects>img{aspect-ratio:2/1}}
+.quiz-layout fieldset:first-of-type .quiz-answers{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:790px){.quiz-layout fieldset:first-of-type .quiz-answers{grid-template-columns:repeat(2,minmax(0,1fr))}}

@@ -226,6 +226,42 @@ if (quiz) {
     branch('[data-owned]',land==='owned'||land==='review');
     branch('[data-looking]',land==='search');
   }
+  const answerGroups = new Map();
+  for (const select of quiz.querySelectorAll('select')) {
+    const label = select.parentElement;
+    const labelText = label.firstChild.textContent.trim();
+    const group = document.createElement('div');
+    group.className = 'quiz-answer-group';
+    const options = document.createElement('div');
+    options.className = 'quiz-answers';
+    options.setAttribute('role','group');
+    options.setAttribute('aria-label',labelText);
+    const buttons = [];
+    for (const option of select.options) {
+      if (select.required && !option.value) continue;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'quiz-answer';
+      button.dataset.answer = option.value;
+      button.textContent = option.textContent;
+      button.addEventListener('click',()=>{
+        select.value = option.value;
+        select.dispatchEvent(new Event('input',{bubbles:true}));
+        if (select.name==='goal' && step===0) quiz.requestSubmit();
+      });
+      options.append(button);
+      buttons.push(button);
+    }
+    label.replaceWith(group);
+    select.hidden = true;
+    if (!select.required) {
+      const caption = paragraph(labelText);
+      caption.className = 'quiz-answer-caption';
+      group.append(caption);
+    }
+    group.append(select,options);
+    answerGroups.set(select,buttons);
+  }
   let step = 0;
   function render() {
     steps.forEach((field,i)=>{
@@ -234,9 +270,13 @@ if (quiz) {
     });
     progress.textContent = step===steps.length ? 'Ваши варианты' : `Шаг ${step+1} из ${steps.length}`;
     back.hidden = step===0;
-    next.hidden = step===steps.length;
+    next.hidden = step===0 || step===steps.length;
     next.textContent = step===steps.length-1?'Показать варианты':'Далее';
     result.hidden = step!==steps.length;
+    next.disabled = Boolean(steps[step]?.querySelector('select[required]:invalid'));
+    for (const [select,buttons] of answerGroups) {
+      buttons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.answer===select.value)));
+    }
   }
   function values() {
     return Object.fromEntries(Array.from(quiz.querySelectorAll('[name]')).filter(x=>!x.disabled).map(x=>[x.name,x.value]));
@@ -285,7 +325,8 @@ if (quiz) {
     step++;
     if (step===steps.length) showResult();
     render();
-    steps[step]?.querySelector('select,input')?.focus();
+    const focusTarget = steps[step]?.querySelector('[data-answer][aria-pressed="true"], [data-answer], input:not([hidden])') || result.querySelector('a');
+    focusTarget?.focus({preventScroll:true});
   });
   back.addEventListener('click',()=>{if (step>0)step--;render();});
   if (!control(quiz,'goal').value && Object.hasOwn(initialModels,requested)) choose(control(quiz,'goal'),'living');
