@@ -74,7 +74,8 @@
   background:linear-gradient(90deg,#152a23 0%,#152a23f7 3%,#152a237a 24%,transparent 52%),
              linear-gradient(0deg,#14251e96 0%,transparent 27%);
 }
-.build-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:54% 50%}
+.build-video,.build-sequence{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:54% 50%}
+.build-run.shows-video .build-sequence{opacity:0}
 .build-film-credit{position:absolute;bottom:1.5rem;right:1.55rem;font-size:.68rem;letter-spacing:.07em;color:#fff5df;text-shadow:0 1px 7px #102018}
 .build-steps{width:min(55%,45rem);position:relative;z-index:1;padding-inline:clamp(1rem,2.6vw,3rem) clamp(1rem,3.2vw,3.35rem)}
 .build-step{position:relative;display:grid;grid-template-columns:clamp(3.75rem,8vw,7.65rem) minmax(0,1fr);align-items:center;min-height:58svh}
@@ -105,7 +106,7 @@
   .has-motion .build-backdrop{height:40svh;z-index:2}
   .build-visual{inset:0}
   .build-visual::after{background:linear-gradient(0deg,#152a23b0,transparent 30%)}
-  .build-video{object-position:center}
+  .build-video,.build-sequence{object-position:center}
   .build-film-credit{bottom:.85rem;right:1rem;font-size:.59rem}
   .build-step,.build-step:first-child,.build-step:last-child{min-height:58svh;grid-template-columns:3.35rem minmax(0,1fr)}
   .build-step-copy{padding-block:1.6rem}
