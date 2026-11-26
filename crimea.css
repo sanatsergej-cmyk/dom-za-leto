@@ -62,3 +62,28 @@
   .place-feature figure{width:100%;min-height:0}
   .place-copy{min-width:0}
 }
+
+.build-story.is-enhanced .build-run{height:164svh}
+.build-backdrop{height:100svh}
+.build-visual{position:absolute;inset:0;overflow:hidden}
+.build-video{position:absolute;inset:0;width:100%;height:100%;z-index:2;object-fit:cover;object-position:55% 52%;opacity:0;transition:opacity .16s ease;pointer-events:none}
+.build-video.is-visible{opacity:1}
+.build-caption{padding-top:3rem;background:linear-gradient(0deg,#10241bf5 0%,#10241bbc 62%,transparent 100%)}
+.build-caption [data-build-beat]{animation:build-caption-in .22s ease-out}
+@keyframes build-caption-in{from{opacity:0;transform:translateY(.25rem)}}
+.build-caption p.tag{color:#ead6a5;font:700 .73rem/1.15 "Golos Text",sans-serif;letter-spacing:.13em;margin-bottom:.46rem}
+.build-caption h2{font-size:clamp(1.8rem,4vw,3.6rem);margin:0 0 .24rem}
+.build-caption p:not(.tag){max-width:55ch;margin-bottom:.65rem}
+.build-caption .action{min-height:2.65rem;padding-block:.34rem}
+.build-caption .action-arrow{width:1.75rem;height:1.75rem;flex-basis:1.75rem}
+@media(max-width:740px){
+  .build-story.is-enhanced .build-run{height:155svh}
+  .build-backdrop{
+    display:flex;flex-direction:column;justify-content:center;height:85svh;
+    background:linear-gradient(145deg,#264134,#10241b 80%);
+  }
+  .build-visual{position:relative;inset:auto;width:100%;height:min(73vw,40svh)}
+  .build-caption{position:relative;inset:auto;min-height:12.5rem;padding-top:1rem;background:none}
+  .build-caption p:not(.tag){font-size:.91rem;line-height:1.36}
+}
+@media(prefers-reduced-motion:reduce){.build-video{transition:none}.build-caption [data-build-beat]{animation:none}}

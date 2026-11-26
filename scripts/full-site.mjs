@@ -56,10 +56,20 @@ const chapters = [
   ['facade','Флагман','Флагман · Дом 89','Три спальни и 80,1 м² внутри. Посмотрите план или подберите комплектацию для своего участка.'],
 ];
 const buildImage = key => key==='facade'?'assets/house89-daylight-1100.webp':e('build-'+key+'.webp');
+const storyBeats = [
+  ['Участок','Дом начинается с места','Проверим, куда поставить дом, как заедет техника и что нужно учесть при подключении сетей.','land/search/','Поможем подобрать участок'],
+  ['Проект','Согласуем план до стройки','Планировка, проёмы и состав комплектации определяются заранее. На участке готовим основание под проект.','projects/dom-89/','Посмотреть планировку'],
+  ['Заводские панели','Коробка собирается на участке','Панели с готовыми проёмами и плиты перекрытия делают на заводе по размерам проекта. На участке остаётся собрать их краном.','technology/','Как устроены панели'],
+  ['Отделка','От коробки до готового фасада','Для Дома 89 показали дерево и светлый фасад. Отделку, окна и состав работ согласуем до сметы.','equipment/','Сравнить комплектации'],
+  ['Дом 89','Ваш дом может быть следующим','Три спальни и 80,1 м² внутри. Примерьте проект к участку и передайте параметры для расчёта.','quiz/?model=89','Хочу такой дом'],
+];
 const scene = `<section class="build-story" id="stages" aria-label="Как строится Дом 89">
   <div class="build-run"><div class="build-backdrop" hidden>
+    <div class="build-visual">
     ${chapters.map(([key],i)=>`<img class="build-frame" data-build-frame="${key}" src="${buildImage(key)}" alt="" ${i===0?'style="opacity:1"':''} loading="lazy" fetchpriority="low" decoding="async">`).join('')}
-    <div class="build-caption"><p data-build-title>${chapters[0][2]}</p><p data-build-copy>${chapters[0][3]}</p></div>
+    <video class="build-video" data-video-src="assets/editorial/build-scroll.mp4" preload="none" muted playsinline aria-hidden="true"></video>
+    </div>
+    <div class="build-caption">${storyBeats.map(([label,title,copy,url,cta],i)=>`<div data-build-beat${i?' hidden':''}><p class="tag">${label}</p><h2>${title}</h2><p>${copy}</p>${action(url,cta)}</div>`).join('')}</div>
   </div>
   <div class="build-chapters">${chapters.map(([key,label,title,copy])=>`<figure class="build-chapter">
     <img src="${buildImage(key)}" alt="${title}" loading="lazy" decoding="async" width="768" height="512">
@@ -294,12 +304,14 @@ export function buildFullSite({write,seo,escape}) {
   for (const {file,title,description,body,script} of entries) {
     const base = '../'.repeat(file.split('/').length-1)||'./';
     const here = file.replace(/index.html$/,'');
+    const isHome = file==='index.html';
+    const hasBuildStory = isHome || here==='projects/dom-89/';
     const menu = [['objects/','Наши дома'],['dohodnye-doma/','Доходные дома'],['gostevye-doma/','Гостевые дома'],['architecture/','Архитектура'],['land/','Участки'],['invest/','Инвестору'],['calculator/','Калькулятор']];
     const links = menu.map(([url,name])=>`<a href="${url}"${here===url?' aria-current="page"':''}>${name}</a>`).join('');
-    const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><base href="${base}"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)} · Дом за лето</title><meta name="description" content="${escape(description)}"><meta name="theme-color" content="#24372e"><link rel="icon" href="assets/logo.webp"><link rel="stylesheet" href="full-site.css?v=layout2"><link rel="stylesheet" href="crimea.css?v=1">${file==='index.html'?'<link rel="stylesheet" href="flagship.css?v=2">':''}${seo(file,title,description,here.startsWith('journal/')&&here!=='journal/')}</head><body>
+    const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><base href="${base}"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)} · Дом за лето</title><meta name="description" content="${escape(description)}"><meta name="theme-color" content="#24372e"><link rel="icon" href="assets/logo.webp"><link rel="stylesheet" href="full-site.css?v=layout2"><link rel="stylesheet" href="crimea.css?v=${hasBuildStory?2:1}">${isHome?'<link rel="stylesheet" href="flagship.css?v=3">':''}${seo(file,title,description,here.startsWith('journal/')&&here!=='journal/')}</head><body>
     <header class="top"><a class="brand" href="./"><img src="assets/logo.webp" alt="Дом за лето · Главная" width="398" height="200"></a><nav aria-label="Меню сайта">${links}</nav><div class="top-actions"><div class="top-contact"><a class="top-phone" href="tel:+79787245424">+7 978 724-54-24</a><a href="contacts/"${here==='contacts/'?' aria-current="page"':''}>Контакты</a></div><a class="top-cta" href="quiz/">Выбрать свой дом<span class="action-arrow" aria-hidden="true">↗</span></a></div></header>
     <main>${body}</main>
-    <footer class="foot"><div class="foot-brand"><a class="brand" href="./">${image('assets/logo.webp','')}<b>Дом за лето</b></a><p>Частные, доходные и гостевые дома в Крыму</p><a href="tel:+79787245424">+7 978 724-54-24</a></div><nav aria-label="Разделы">${links}<a href="contacts/">Контакты</a><a href="projects/">Каталог проектов</a><a href="production/">Производство</a><a href="technology/">Технология</a><a href="construction/">Как строим</a><a href="equipment/">Комплектации</a><a href="configure/">Конфигуратор</a></nav><div class="foot-bottom"><span>Дом за лето · Крым · 2026</span><span>Стоимость и состав работ подтверждаются по проекту и участку.</span></div></footer>${[].concat(script).filter(Boolean).map(file=>`<script src="${file}?v=crimea1" defer></script>`).join('')}</body></html>`;
+    <footer class="foot"><div class="foot-brand"><a class="brand" href="./">${image('assets/logo.webp','')}<b>Дом за лето</b></a><p>Частные, доходные и гостевые дома в Крыму</p><a href="tel:+79787245424">+7 978 724-54-24</a></div><nav aria-label="Разделы">${links}<a href="contacts/">Контакты</a><a href="projects/">Каталог проектов</a><a href="production/">Производство</a><a href="technology/">Технология</a><a href="construction/">Как строим</a><a href="equipment/">Комплектации</a><a href="configure/">Конфигуратор</a></nav><div class="foot-bottom"><span>Дом за лето · Крым · 2026</span><span>Стоимость и состав работ подтверждаются по проекту и участку.</span></div></footer>${[].concat(script).filter(Boolean).map(file=>`<script src="${file}?v=${file==='build-scene.js'||file==='flagship.js'?'scroll2':'crimea1'}" defer></script>`).join('')}</body></html>`;
     write(file, html.replace(/(<a [^>]*?)href="(\.\/|[a-z0-9-]+(?:\/[a-z0-9-]+)*\/)((?:[?#][^"]*)?)"/g, '$1href="$2index.html$3"'));
   }
   return entries.map(({file})=>file.replace(/index.html$/,''));
