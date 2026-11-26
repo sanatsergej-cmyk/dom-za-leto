@@ -170,7 +170,7 @@ if (quiz) {
   const progress = quiz.querySelector('[data-progress]');
   const selection = quiz.querySelector('[data-quiz-selection]');
   const requested = params.get('model');
-  const initialModels = {'89':'Дом 89','110':'Дом 110','8x8':'Дом 64 м²'};
+  const initialModels = {'89':'Дом 89','110':'Дом 110','8x8':'Дом 64 м²','62':'Дом 62 м²'};
   if (Object.hasOwn(initialModels,requested)) {
     selection.textContent = `Выбранный проект · ${initialModels[requested]}`;
     selection.hidden = false;
@@ -195,8 +195,8 @@ if (quiz) {
   function branches() {
     const goal = control(quiz,'goal').value;
     const land = control(quiz,'land').value;
-    branch('[data-family]',goal!=='rent');
-    branch('[data-rental]',goal==='rent'||goal==='mixed');
+    branch('[data-family]',goal!=='rent'&&goal!=='guest');
+    branch('[data-rental]',goal==='rent'||goal==='mixed'||goal==='guest');
     branch('[data-owned]',land==='owned'||land==='review');
     branch('[data-looking]',land==='search');
   }
@@ -218,11 +218,14 @@ if (quiz) {
   function showResult() {
     const data = values();
     const rental = data.units==='5'?'5':data.units==='6'?'6':'4m';
-    const home = data.bedrooms==='2'?'8x8':data.feature==='privacy'?'110':data.bedrooms==='3'&&requested==='8x8'?'89':['89','110','8x8'].includes(requested)?requested:'89';
+    const home = data.bedrooms==='2'?(requested==='62'?'62':'8x8'):data.feature==='privacy'?'110':data.bedrooms==='3'&&['8x8','62'].includes(requested)?'89':Object.hasOwn(initialModels,requested)?requested:'89';
     const recommendations = [];
-    if (data.goal!=='rent') recommendations.push([`projects/dom-${home}/`,`Дом ${home==='8x8'?'64 м²':home}`]);
-    if (data.goal==='rent'||data.goal==='mixed') recommendations.push([`invest/projects/dd-${rental}/`,'Подходящая концепция доходного дома']);
-    else recommendations.push(home==='89'?['projects/dom-110/','Сравнить с Домом 110']:['projects/dom-89/','Сравнить с Домом 89']);
+    if (data.goal==='guest') recommendations.push(['gostevye-doma/','Гостевые дома'],['architecture/resort/','Архитектура Resort']);
+    else {
+      if (data.goal!=='rent') recommendations.push([`projects/dom-${home}/`,initialModels[home]]);
+      if (data.goal==='rent'||data.goal==='mixed') recommendations.push(data.units==='custom'?['dohodnye-doma/','Индивидуальный доходный дом']:[`invest/projects/dd-${rental}/`,'Подходящая концепция доходного дома']);
+      else recommendations.push(home==='89'?['projects/dom-110/','Сравнить с Домом 110']:['projects/dom-89/','Сравнить с Домом 89']);
+    }
     result.replaceChildren(paragraph('Посмотрите планировки и уточните готовность по своему бюджету.'));
     const list = document.createElement('ul');
     for (const item of recommendations) {
@@ -231,9 +234,9 @@ if (quiz) {
       list.append(li);
     }
     result.append(list);
-    const selected = data.goal==='rent' ? `ДД-${rental}` : initialModels[home];
+    const selected = data.goal==='guest' ? 'Гостевой дом' : data.goal==='rent' ? (data.units==='custom'?'Доходный дом по индивидуальному заданию':`ДД-${rental}`) : initialModels[home];
     const briefLabels = {goal:'Цель',land:'Статус участка',location:'Кадастровый номер или адрес',region:'Район',landBudget:'Бюджет на участок',landArea:'Площадь участка',landNeeds:'Подъезд и сети',bedrooms:'Спальни',feature:'Приоритет',units:'Арендные единицы',rentType:'Тип аренды',operator:'Управление',finish:'Готовность',budget:'Бюджет на дом',pay:'Оплата',when:'Срок'};
-    const answerLabels = {living:'Постоянное проживание',seasonal:'Дача',rent:'Аренда',mixed:'Комбинированно',unknown:'Пока выбираю',owned:'Свой участок',review:'Есть вариант',search:'Нужен подбор',cash:'Свои средства',mortgage:'Ипотека',terrace:'Терраса',privacy:'Санузел при спальне'};
+    const answerLabels = {living:'Постоянное проживание',seasonal:'Дача',rent:'Доходный дом',guest:'Гостевой дом',custom:'2–3 или больше 6',mixed:'Комбинированно',unknown:'Пока выбираю',owned:'Свой участок',review:'Есть вариант',search:'Нужен подбор',cash:'Свои средства',mortgage:'Ипотека',terrace:'Терраса',privacy:'Санузел при спальне'};
     const note = ['Подбор дома','Здравствуйте! Хочу обсудить строительство.',`Ориентир проекта: ${selected}`,...Object.entries(data).filter(([,value])=>value).map(([key,value])=>`${briefLabels[key]}: ${answerLabels[value]||value}`)];
     if (params.get('package')) note.push(`Интересующий пакет: ${params.get('package')}`);
     for (const key of ['utm_source','utm_medium','utm_campaign','utm_content']) if(params.has(key)) note.push(`${key}: ${params.get(key)}`);

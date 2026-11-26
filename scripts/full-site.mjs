@@ -19,6 +19,7 @@ const assets = {
 const houseCards = () => `<div class="project-grid">${[
   ...Object.entries(assets).map(([id,h]) => card(`projects/dom-${id}/`,`Дом ${id}`,`${h.area} м² внутри. ${h.desc}`,image('assets/'+h.photo,'Фасадный визуал из архива проекта'))),
   card('projects/dom-8x8/','Дом 64 м²', 'Две спальни, кухня-гостиная и свой двор. Компактный дом для круглогодичного проживания.',editorial('house-8x8-small','Концептуальный фасад дома 64 м²')),
+  card('projects/dom-62/','Дом 62 м²','Компактная концепция с односкатной крышей.',editorial('house-62','Концептуальный фасад дома 62 м²')),
 ].join('')}</div>`;
 const gallery = [
   ['open-life','Open Life','Архитектурная визуализация Тетрики · слайд 15'],
@@ -70,11 +71,11 @@ const technical = `<div class="spec-strip"><div><strong>230 мм</strong><span>�
 ])}<p>${action('technology/','Подробнее о технологии')}</p>`;
 const routes = [
   ['projects/','Дома для жизни','Планы и комплектации'],
-  ['mortgage/','Семейная ипотека','Выберите 89 или 110'],
-  ['invest/','Доходные дома','Модели и калькулятор аренды'],
+  ['dohodnye-doma/','Доходные дома','Здания с несколькими квартирами для аренды'],
+  ['gostevye-doma/','Гостевые дома','От одного домика до группы на участке'],
   ['land/','Земельный участок','Проверка и подбор'],
   ['architecture/','Архитектура','Open Life, Soft и Resort'],
-  ['construction/','Как строим','Этапы и контроль работ'],
+  ['invest/','Инвестору','Вложения, расходы и сценарии'],
 ];
 const collections = [
   ['open-life','Open Life','Чистые линии, широкие проёмы и прямой выход на террасу.','open-life'],
@@ -82,19 +83,32 @@ const collections = [
   ['resort','Resort','Арочные проёмы и выразительные формы для дома и гостевых сценариев.','resort'],
 ];
 const collectionCards = () => grid(collections.map(([id,title,description,photo])=>card(`architecture/${id}/`,title,description,editorial(photo,`Архитектурная концепция ${title}`))));
-add('index.html','Дома для жизни и для аренды в Крыму','Проекты домов 89, 110 и 8 × 8, ипотечный расчёт, участки и производство.',`
+const readiness = [
+  ['Домокомплект','Стеновые панели, перегородки и панели покрытия по проекту.'],
+  ['Тепловой контур','Фундамент, стены, кровля и окна в согласованной комплектации.'],
+  ['Предчистовая с инженерией','Подготовка поверхностей и инженерные системы по смете.'],
+  ['Отделка и мебель','Согласованные покрытия и выбранный комплект мебели.'],
+];
+const readinessCards = `<dl class="sales-points">${readiness.map(([title,text])=>`<div><dt>${title}</dt><dd>${text}</dd></div>`).join('')}</dl>`;
+const advantages = `<dl class="sales-points">
+  <div><dt>Панели изготавливают на заводе</dt><dd>Состав и размеры панелей сверяем по проекту до монтажа.</dd></div>
+  <div><dt>Железобетон и утеплитель в стене</dt><dd>В типовой наружной панели Тетрики утеплитель расположен между двумя слоями бетона.</dd></div>
+  <div><dt>Смета с понятной готовностью</dt><dd>Отдельно видны работы по дому, доплаты по участку и опции.</dd></div>
+</dl><p>Сравниваете с СИП или каркасом? Сопоставьте одинаковую комплектацию, характеристики стены и состав работ по смете.</p>${action('technology/compare/','Как сравнить технологии')}`;
+add('index.html','Частные, доходные и гостевые дома в Крыму','Дом за лето строит дома для жизни и проектирует доходные и гостевые дома из заводских панелей.',`
   <section class="opening home-editorial">
-    <div class="opening-copy"><p class="tag">Дома из заводских панелей</p><h1>Свой дом<br>в Крыму.</h1><p>Сравните проекты, проверьте участок и выберите, в какой комплектации строить.</p><div class="buttons">${action('quiz/','Подобрать дом')}<a class="quiet" href="projects/">Смотреть проекты ↗</a></div></div>
+    <div class="opening-copy"><p class="tag">Дома из заводских панелей</p><h1>Свой дом<br>в Крыму.</h1><p>Строим дома для жизни. Проектируем доходные дома и гостевые комплексы под ваш участок.</p><div class="buttons">${action('quiz/','Подобрать дом')}<a class="quiet" href="dohodnye-doma/">Доходные дома ↗</a></div></div>
     <figure><img src="assets/house89-daylight-1100.webp" srcset="assets/house89-daylight-640.webp 640w, assets/house89-daylight-1100.webp 1100w" sizes="(max-width: 740px) 100vw, 62vw" alt="Фасад Дома 89 на визуализации из КП" fetchpriority="high" decoding="async"><figcaption>Дом 89 · проектная визуализация</figcaption></figure>
   </section>
   <nav class="route-grid home-routes" aria-label="Разделы сайта">${routes.map(([url,name,copy])=>`<a href="${url}"><strong>${name} <span aria-hidden="true">↗</span></strong><span>${copy}</span></a>`).join('')}</nav>
   <section class="band home-intro"><div><p class="tag">Дом 89 · от эскиза до фасада</p><h2>Как собирается дом</h2></div><p>Листайте, чтобы пройти путь от чертежа до готового фасада. При прокрутке вверх история идёт обратно.</p></section>
   ${scene}
-  <section class="band home-projects"><div class="home-section-heading"><div><p class="tag">Каталог</p><h2>Три дома для жизни</h2></div><a href="projects/">Смотреть каталог ↗</a></div>${houseCards()}</section>
+  <section class="band home-projects"><div class="home-section-heading"><div><p class="tag">Каталог</p><h2>Четыре дома для жизни</h2></div><a href="projects/">Смотреть каталог ↗</a></div>${houseCards()}</section>
+  ${section('Почему заводские панели',advantages)}
   ${section('Архитектура Тетрики',`<p class="lede">Прямая геометрия Open Life, мягкие формы Soft и арочные фасады Resort.</p>${collectionCards()}`)}
   ${section('Узнайте, с чего начать',`<p class="lede">Расскажите о планах и участке. Покажем варианты, с которых можно начать.</p>${action('quiz/','Подобрать дом')}`)}
 `,{script:'build-scene.js'});
-add('projects/index.html','Проекты домов','Планировки и комплектации домов 89, 110 и концепции 8 × 8.',lead('Каталог','Дома для жизни','Планировки с двумя и тремя спальнями. Выберите, как хотите жить и какой уровень готовности вам нужен.')+section('Выбрать дом',houseCards()));
+add('projects/index.html','Проекты домов','Проекты 89 и 110, компактные концепции 64 и 62 м².',lead('Каталог','Дома для жизни','Планировки с двумя и тремя спальнями. Выберите, как хотите жить и какой уровень готовности вам нужен.')+section('Выбрать дом',houseCards()));
 for(const [id,h] of Object.entries(assets)) {
   add(`projects/dom-${id}/index.html`,`Дом ${id}`,h.desc,lead('Проект дома',`Дом ${id}`,`${h.area} м² внутри. ${h.desc}`,action(`quiz/?model=${id}`,'Рассчитать для участка'))+
     `<div class="wide-media">${image('assets/'+h.photo,'Фасадный визуал из архива проекта',true)}</div>`+
@@ -108,6 +122,10 @@ add('projects/dom-8x8/index.html','Дом 64 м² · Заходи и живи','
   section('Заходи и живи',`<p>В составе сметы проверим отделку, кухню, мебель, технику, свет, сантехнику, отопление и наружные подключения. Состав и цена будут согласованы по проекту.</p>`)+
   section('Два варианта для участка',`<div class="compact-options"><article><h3>Дом 64 м²</h3><p>Две изолированные спальни, общая кухня-гостиная, гардероб и котельная. Ванную и туалет планируем раздельно.</p></article><article><h3>Дом с террасой</h3><p>Открытая терраса со стороны кухни-гостиной. Её площадь и стоимость считаются отдельно, 64 м² относятся к контуру дома.</p></article></div><p>Планировка и смета в разработке.</p>`)+
   section('Терраса и пристройка',`<p>Терраса задумана как отдельный этап. Для пристройки проектировщик проверит место, примыкание, конструкцию и запас инженерии.</p>${action('land/check/','Проверить участок')}`));
+add('projects/dom-62/index.html','Дом 62 м²','Эскиз одноэтажного дома 62 м² с односкатной крышей.',
+ lead('Концепция · 62 м² по наружному контуру','Дом 62 м²','Компактный одноэтажный дом с односкатной крышей. Проектируем для участка, где важен небольшой габарит.',action('quiz/?model=62','Обсудить проект'))+
+ `<figure class="wide-media project-cover">${editorial('house-62','Концепция дома 62 м² с односкатной крышей')}<figcaption>Архитектурная визуализация. Планировка, узлы крыши и смета в разработке.</figcaption></figure>`+
+ section('Что можно выбрать',readinessCards+`<p>Состав и доступность комплектаций подтвердим после проектирования.</p>`));
 const mortgageForm = (price) => `<form class="tool" data-calculator="mortgage" data-model="${price===7800000?89:110}"><div class="fields">
 <label>Стоимость дома, ₽<input name="cost" type="number" min="1" required value="${price}"></label><label>Собственные средства, ₽<input name="deposit" type="number" min="0" required value="${price-6000000}"></label>
 <label>Ставка, % годовых<input name="rate" type="number" min="0" max="100" step=".01" required value="6"></label><label>Срок, лет<input name="years" type="number" min="1" max="50" required value="30"></label>
@@ -125,9 +143,21 @@ for (const [id,h] of Object.entries(assets)) {
 }
 const modelUrl = (key) => `invest/projects/dd-${key}/`;
 const modelCards = () => grid([...models.map(m=>card(modelUrl(m.key),m.code,m.mix,image(m.facade,`Схема фасада ${m.code}`))),card('invest/projects/dd-5/','Дом на пять квартир','Презентационная концепция',editorial('five-units','Лист концепции дома на пять квартир'))]);
-add('invest/index.html','Инвестору · Доходные дома','Концепции на 4–6 квартир, расчёт аренды и проверка участка.',
- lead('ДАДК · Инвестору','Доходный дом на вашем участке','Сравните квартирографию и проверьте экономику на собственных вводных.',action('invest/calculator/','Рассчитать вложения и аренду'))+
- section('Выбрать концепцию',modelCards())+section('Участок и альтернативы',action('land/check/','Проверить участок')+' '+action('invest/rental/','Секционная линейка 4–8')));
+add('dohodnye-doma/index.html','Доходные дома в Крыму','Дом за лето. Проекты доходных домов на несколько квартир и индивидуальное проектирование под аренду.',
+ lead('Дома для аренды','Доходные дома','Проектируем здания с несколькими квартирами для сдачи в аренду. Начинаем с участка, состава квартир и полной сметы.',action('quiz/?goal=rent','Обсудить доходный дом'))+
+ section('От двух квартир до крупного проекта',`<p class="lede">Начинаем с запроса от двух квартир. Задания до 15 квартир на этаже рассматриваем индивидуально после проверки участка и норм. В каталоге ниже показаны проработанные концепции на 4–6 квартир.</p>${modelCards()}`)+
+ section('Перед выбором проекта',`<dl class="sales-points"><div><dt>Участок</dt><dd>Проверим, какой тип здания и масштаб можно рассматривать.</dd></div><div><dt>Состав квартир</dt><dd>Подберём форматы под задачу аренды и габариты участка.</dd></div><div><dt>Экономика</dt><dd>Отдельно считаем стройку, оснащение, аренду и расходы.</dd></div></dl>${action('invest/','Посмотреть расчёты для инвестора')}`));
+add('gostevye-doma/index.html','Гостевые дома в Крыму','Гостевые домики из заводских панелей. Концепции отдельных домиков и групп на участке.',
+ lead('Отдельный домик или комплекс','Гостевые дома','Разрабатываем отдельные гостевые домики и группы домов. Планируем размещение, входы, инженерные сети и наружные зоны под формат отдыха.',action('quiz/?goal=guest','Обсудить гостевой дом'))+
+ section('Архитектура для гостевого проекта',grid([
+   card('architecture/resort/','Resort','Арочные фасады и несколько домиков в единой архитектуре.',editorial('resort','Референс гостевых домов Тетрики')),
+   card('architecture/soft/','Soft','Мягкая геометрия фасада для камерного гостевого формата.',editorial('soft','Архитектурная концепция Soft')),
+ ]))+
+ section('Домики на вашем участке',`<p>Индивидуально определяем число домиков, приватность и подъезд. Проверяем участок и готовим состав работ для расчёта.</p>${action('land/check/','Проверить участок')}`));
+add('invest/index.html','Инвестору · Расчёт проекта','Вложения, доход от аренды, сценарии расходов и проверка участка.',
+ lead('ДАДК · Инвестору','Посчитать инвестиции','Сравните три сценария. Учтите стройку, оснащение, простой, управление и выплаты по кредиту.',action('invest/calculator/','Рассчитать вложения и аренду'))+
+ section('Что проверяем до вложений',`<dl class="sales-points"><div><dt>Полный бюджет</dt><dd>Земля, стройка, подключения, отделка и оснащение.</dd></div><div><dt>Поток от аренды</dt><dd>Вводные по ставкам, простоям, расходам и финансированию.</dd></div><div><dt>Сценарий управления</dt><dd>Самостоятельная сдача или работа с управляющей компанией.</dd></div></dl>${action('dohodnye-doma/','Посмотреть доходные дома')}`)+
+ section('Участок и альтернативы',action('land/check/','Проверить участок')+' '+action('invest/rental/','Секционная линейка 4–8')));
 add('invest/projects/index.html','Каталог доходных домов','Пять концепций доходных домов.',lead('ДАДК · Каталог','Доходные дома','Схемы для сравнения квартирографии и проработки участка.')+section('Проекты',modelCards()));
 for (const m of models) {
   add(`${modelUrl(m.key)}index.html`,m.code,m.mix,
@@ -162,9 +192,9 @@ add('land/search/index.html','Подобрать участки','Фильтры
 add('quiz/index.html','Подобрать дом','Пройдите опрос и сохраните варианты и параметры.',lead('Подбор проекта','Какой дом вам подойдёт?','Расскажите, для чего нужен дом и есть ли у вас участок. Покажем подходящие проекты и поможем начать разговор о смете.')+
  `<section class="band"><form class="tool" data-quiz>
  <p class="tag" data-progress>Шаг 1 из 5</p><p class="quiz-selection" data-quiz-selection hidden></p>
- <fieldset data-step><legend>Для чего нужен дом?</legend><label>Цель<select name="goal" required><option value="">Выберите вариант</option><option value="living">Для постоянного проживания</option><option value="seasonal">Для отдыха и дачи</option><option value="rent">Для сдачи</option><option value="mixed">Жить и сдавать</option><option value="unknown">Пока выбираю</option></select></label></fieldset>
+ <fieldset data-step><legend>Для чего нужен дом?</legend><label>Цель<select name="goal" required><option value="">Выберите вариант</option><option value="living">Для постоянного проживания</option><option value="seasonal">Для отдыха и дачи</option><option value="rent">Доходный дом с квартирами</option><option value="guest">Гостевой дом или комплекс</option><option value="mixed">Жить и сдавать</option><option value="unknown">Пока выбираю</option></select></label></fieldset>
  <fieldset data-step hidden><legend>Что с участком?</legend><label>Статус<select name="land" required><option value="">Выберите вариант</option><option value="owned">Уже есть</option><option value="review">Есть вариант на примете</option><option value="search">Хочу подобрать</option><option value="unknown">Пока выбираю</option></select></label><label data-owned>Кадастровый номер или адрес<input name="location" maxlength="220"></label><div class="fields" data-looking><label>Район<input name="region" maxlength="100"></label><label>Бюджет на участок, ₽<input name="landBudget" min="0" type="number"></label><label>Желаемая площадь, соток<input name="landArea" min="0" step=".1" type="number"></label><label>Подъезд и сети<input name="landNeeds" maxlength="160"></label></div></fieldset>
- <fieldset data-step hidden><legend>Как устроить дом?</legend><div class="fields" data-family><label>Спальни<select name="bedrooms"><option value="">Пока выбираю</option><option value="2">Две</option><option value="3">Три</option></select></label><label>Что особенно важно?<select name="feature"><option value="">Пока выбираю</option><option value="terrace">Терраса</option><option value="privacy">Санузел при спальне</option></select></label></div><div class="fields" data-rental><label>Арендных единиц<select name="units"><option value="">Пока выбираю</option><option>4</option><option>5</option><option>6</option></select></label><label>Аренда<select name="rentType"><option value="">Пока выбираю</option><option>Долгосрочная</option><option>Посуточная</option></select></label><label>Управление<select name="operator"><option value="">Пока выбираю</option><option>Самостоятельно</option><option>Ищу оператора</option></select></label></div></fieldset>
+ <fieldset data-step hidden><legend>Как устроить дом?</legend><div class="fields" data-family><label>Спальни<select name="bedrooms"><option value="">Пока выбираю</option><option value="2">Две</option><option value="3">Три</option></select></label><label>Что особенно важно?<select name="feature"><option value="">Пока выбираю</option><option value="terrace">Терраса</option><option value="privacy">Санузел при спальне</option></select></label></div><div class="fields" data-rental><label>Арендных единиц<select name="units"><option value="">Пока выбираю</option><option value="custom">2–3 или больше 6 · индивидуально</option><option>4</option><option>5</option><option>6</option></select></label><label>Аренда<select name="rentType"><option value="">Пока выбираю</option><option>Долгосрочная</option><option>Посуточная</option></select></label><label>Управление<select name="operator"><option value="">Пока выбираю</option><option>Самостоятельно</option><option>Ищу оператора</option></select></label></div></fieldset>
  <fieldset data-step hidden><legend>Готовность и бюджет</legend><div class="fields"><label>Готовность<select name="finish"><option value="">Нужна помощь</option><option>Домокомплект</option><option>Тёплый контур</option><option>Предчистовая</option><option>Под ключ</option></select></label><label>Бюджет на строительство, ₽<input name="budget" min="0" type="number"></label></div></fieldset>
  <fieldset data-step hidden><legend>Когда и как планируете строить?</legend><div class="fields"><label>Оплата<select name="pay"><option value="">Пока выбираю</option><option value="cash">Свои средства</option><option value="mortgage">Ипотека</option><option value="mixed">Комбинированно</option></select></label><label>Когда начать?<select name="when"><option value="">Пока выбираю</option><option>В ближайшие месяцы</option><option>В течение года</option><option>Позже</option></select></label></div></fieldset>
  <div class="buttons"><button type="button" class="quiet" data-back hidden>Назад</button><button class="action" data-next>Далее</button></div>
@@ -209,8 +239,12 @@ for(const [key,title,copy,more] of book) {
     section('Следующий шаг',action(key==='ipoteka'?'mortgage/':key==='arenda'?'invest/calculator/':key==='komplektaciya'?'equipment/':'land/check/',key==='ipoteka'?'Калькулятор ипотеки':key==='arenda'?'Рассчитать аренду':key==='komplektaciya'?'Посмотреть комплектации':'Проверить участок')));
 }
 const packages = [['Домокомплект',2278000,2745000],['Коробка на фундаменте клиента',3934000,4558000],['Коробка с окнами',4362000,4972000],['Тепловой контур',5353000,6187000],['Готовность к инженерии',5943000,6887000],['Предчистовая с инженерией',7800000,8800000],['Чистовая отделка',8580000,9680000],['Отделка и мебель',9360000,10560000]];
+add('technology/compare/index.html','Панельный дом, СИП и каркас · Что сравнить','Сравнение стройки по конструкции, смете, влажности и контролю монтажа.',
+ lead('Технология','За что вы платите в смете','Сравните одинаковый уровень готовности и посмотрите, какие параметры подтверждены документами.')+
+ section('Четыре проверки перед выбором',`<dl class="sales-points"><div><dt>Состав стены и узлы</dt><dd>Запросите разрез стены, утепление, схему примыканий, расчётные характеристики и проектные ограничения.</dd></div><div><dt>Влажность и защита</dt><dd>Для деревянных конструкций проверьте влажность материала, условия хранения и защиту от намокания. Для панелей — гидроизоляцию и герметизацию стыков по проекту.</dd></div><div><dt>Готовность и добавки</dt><dd>Сопоставьте фундамент, кровлю, окна, инженерию, доставку и монтаж на одной стадии готовности.</dd></div><div><dt>Контроль монтажа</dt><dd>Уточните, что принимается на заводе, что проверяется на участке и кто отвечает за исправления.</dd></div></dl>${action('equipment/','Сравнить готовность домов')}`));
 add('equipment/index.html','Комплектации и инженерия','Сравнение восьми уровней готовности и ориентир по пакету.',
  lead('Комплектации','Что входит в стоимость','Сравните уровни готовности домов 89 и 110. Цены из общего КП от 11 ноября 2026 требуют подтверждения для конкретного участка.')+
+ section('Четыре уровня готовности',readinessCards)+
  section('Ориентир по пакету',`<form id="package-tool" class="tool" data-calculator="package"><div class="fields"><label>Дом<select name="model"><option value="89">Дом 89</option><option value="110">Дом 110</option></select></label><label>Готовность<select name="package">${packages.map(([name,a,b],i)=>`<option value="${i}" data-price89="${a}" data-price110="${b}" ${i===5?'selected':''}>${name}</option>`).join('')}</select></label></div><output aria-live="polite"></output><a data-package-quiz href="quiz/">Подобрать дом с этой комплектацией ↗</a></form>`)+
  section('Ступени готовности',`<div class="table-wrap"><table><thead><tr><th>Пакет</th><th>Дом 89</th><th>Дом 110</th></tr></thead><tbody>${packages.map(([n,a,b])=>`<tr><th scope="row">${n}</th><td>${a.toLocaleString('ru-RU')} ₽</td><td>${b.toLocaleString('ru-RU')} ₽</td></tr>`).join('')}</tbody></table></div><p>Землю, нестандартные работы и дополнительные подключения уточняем по смете.</p>`),{script:'full-site.js'});
 
@@ -218,12 +252,12 @@ export function buildFullSite({write,seo,escape}) {
   for (const {file,title,description,body,script} of entries) {
     const base = '../'.repeat(file.split('/').length-1)||'./';
     const here = file.replace(/index.html$/,'');
-    const menu = [['projects/','Дома'],['architecture/','Архитектура'],['construction/','Как строим'],['mortgage/','Ипотека'],['land/','Участки'],['invest/','Инвестору']];
+    const menu = [['projects/','Дома'],['dohodnye-doma/','Доходные дома'],['gostevye-doma/','Гостевые дома'],['architecture/','Архитектура'],['land/','Участки'],['invest/','Инвестору']];
     const links = menu.map(([url,name])=>`<a href="${url}"${here===url?' aria-current="page"':''}>${name}</a>`).join('');
-    const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><base href="${base}"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)} · Дом за лето</title><meta name="description" content="${escape(description)}"><meta name="theme-color" content="#24372e"><link rel="icon" href="assets/logo.webp"><link rel="stylesheet" href="full-site.css?v=brand2">${seo(file,title,description,here.startsWith('journal/')&&here!=='journal/')}</head><body>
+    const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><base href="${base}"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)} · Дом за лето</title><meta name="description" content="${escape(description)}"><meta name="theme-color" content="#24372e"><link rel="icon" href="assets/logo.webp"><link rel="stylesheet" href="full-site.css?v=income1">${seo(file,title,description,here.startsWith('journal/')&&here!=='journal/')}</head><body>
     <header class="top"><a class="brand" href="./">${image('assets/logo.webp','',true)}<b>Дом за лето</b></a><nav aria-label="Меню сайта">${links}</nav><a class="top-cta" href="quiz/">Подобрать дом ↗</a></header>
     <main>${body}</main>
-    <footer class="foot"><div class="foot-brand"><a class="brand" href="./">${image('assets/logo.webp','')}<b>Дом за лето</b></a><p>Дома из заводских панелей в Крыму</p><a href="tel:+79787245424">+7 978 724-54-24</a></div><nav aria-label="Разделы">${links}<a href="production/">Производство</a><a href="technology/">Технология</a><a href="construction/">Как строим</a><a href="equipment/">Комплектации</a><a href="configure/">Конфигуратор</a></nav><div class="foot-bottom"><span>Дом за лето · Крым · 2026</span><span>Стоимость и состав работ подтверждаются по проекту и участку.</span></div></footer>${script?`<script src="${script}?v=brand2" defer></script>`:''}</body></html>`;
+    <footer class="foot"><div class="foot-brand"><a class="brand" href="./">${image('assets/logo.webp','')}<b>Дом за лето</b></a><p>Частные, доходные и гостевые дома в Крыму</p><a href="tel:+79787245424">+7 978 724-54-24</a></div><nav aria-label="Разделы">${links}<a href="production/">Производство</a><a href="technology/">Технология</a><a href="construction/">Как строим</a><a href="equipment/">Комплектации</a><a href="configure/">Конфигуратор</a></nav><div class="foot-bottom"><span>Дом за лето · Крым · 2026</span><span>Стоимость и состав работ подтверждаются по проекту и участку.</span></div></footer>${script?`<script src="${script}?v=income1" defer></script>`:''}</body></html>`;
     write(file, html.replace(/(<a [^>]*?)href="(\.\/|[a-z0-9-]+(?:\/[a-z0-9-]+)*\/)((?:[?#][^"]*)?)"/g, '$1href="$2index.html$3"'));
   }
   return entries.map(({file})=>file.replace(/index.html$/,''));

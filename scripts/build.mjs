@@ -119,7 +119,7 @@ for (const file of fs.readdirSync(path.join(root,'buyer')).filter(name=>name.end
   html = html.replace(/<link rel="canonical"[^>]*>/g,'')
     .replace(/<meta property="og:[^>]*>/g,'')
     .replace(/<script type="application\/ld\+json">.*?<\/script>/gs,'');
-  html = html.replace(/<header>.*?<\/header>/s, header.replaceAll('href="buyer/', 'href="../buyer/').replace('href="mortgage/index.html"','href="../mortgage/index.html"'));
+  html = html.replace(/<header>.*?<\/header>/s, header.replaceAll('href="buyer/', 'href="../buyer/').replace(/href="((?:dohodnye-doma|gostevye-doma)\/index\.html)"/g,'href="../$1"'));
   html = html.replace(/<footer>.*?<\/footer>/s, footer.replaceAll('href="buyer/', 'href="../buyer/'));
   // Buyer assets remain relative to their own directory.
   html = html.replace('src="assets/logo.webp"', 'src="../assets/logo.webp"');
