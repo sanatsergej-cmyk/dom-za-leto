@@ -17,9 +17,9 @@ const assets = {
   110: {area:'99,8', plan:'editorial/plan-110.webp', photo:'evening-640.webp', desc:'Три спальни, две гардеробные и отдельный санузел родителей.', price:8800000},
 };
 const houseCards = () => `<div class="project-grid">${[
-  ...Object.entries(assets).map(([id,h]) => card(`projects/dom-${id}/`,`Дом ${id}`,`${h.area} м² внутри. ${h.desc}`,image('assets/'+h.photo,'Фасадный визуал из архива проекта'))),
-  card('projects/dom-8x8/','Дом 64 м²', 'Две спальни, кухня-гостиная и свой двор. Компактный дом для круглогодичного проживания.',editorial('house-8x8-small','Концептуальный фасад дома 64 м²')),
-  card('projects/dom-62/','Дом 62 м²','Компактная концепция с односкатной крышей.',editorial('house-62','Концептуальный фасад дома 62 м²')),
+  ...Object.entries(assets).map(([id,h]) => card(`projects/dom-${id}/`,`Дом ${id}`,`${h.area} м² внутри. ${h.desc}`, `<img src="assets/${h.photo}" srcset="assets/${h.photo} 640w, assets/${h.photo.replace('-640','-1100')} 1100w" sizes="(max-width: 740px) 90vw, 43vw" alt="Фасад Дома ${id} из КП" loading="lazy" decoding="async">`)),
+  card('architecture/soft/','Soft','Мягкие углы и спокойный фасад. Архитектурное направление Тетрики.',editorial('soft','Фасад Soft из презентации Тетрики')),
+  card('architecture/resort/','Resort','Арки и светлая отделка. Архитектурное направление Тетрики.',editorial('resort','Фасад Resort из презентации Тетрики')),
 ].join('')}</div>`;
 const gallery = [
   ['open-life','Open Life','Архитектурная визуализация Тетрики · слайд 15'],
@@ -56,27 +56,24 @@ const chapters = [
   ['facade','Флагман','Флагман · Дом 89','Три спальни и 80,1 м² внутри. Посмотрите план или подберите комплектацию для своего участка.'],
 ];
 const buildImage = key => key==='facade'?'assets/house89-daylight-1100.webp':e('build-'+key+'.webp');
-const scene = `<section class="build-story" aria-label="История строительства Дома 89">
-  <div class="build-backdrop">${chapters.map(([key],i)=>`<img class="build-frame" data-build-frame="${key}" ${i===0?'data-active':''} src="${buildImage(key)}" alt="" loading="lazy" decoding="async">`).join('')}<nav class="build-nav" aria-label="Стадии строительства" hidden>${chapters.map(([key,label],i)=>`<button type="button" data-build-jump="${key}" aria-label="${i+1}. ${label}" title="${label}">${i+1}</button>`).join('')}</nav></div>
-  <div class="build-chapters">${chapters.map(([key,label,title,copy],i)=>`<article class="build-chapter" data-build-chapter="${key}"${key==='sketch'?' id="stages"':''}>
-    <picture class="build-static"><img src="${buildImage(key)}" alt="${title}" loading="lazy" decoding="async" width="768" height="512"></picture>
-    <div class="chapter-note"><p class="tag">${String(i+1).padStart(2,'0')} / ${String(chapters.length).padStart(2,'0')} · ${label}</p><h2 tabindex="-1">${title}</h2><p>${copy}</p>${key==='facade'?`<div class="buttons">${action('quiz/?model=89','Хочу такой дом')} <a href="projects/dom-89/">План дома</a> <a href="assets/editorial/build-preview.mp4?v=9">Смотреть ролик</a></div>`:''}</div>
-  </article>`).join('')}</div>
-  <p class="build-credit">Эскиз и стадии монтажа — художественная визуализация. Финальный фасад — изображение из коммерческого предложения.</p>
+const scene = `<section class="build-story" id="stages" aria-label="Как строится Дом 89">
+  <div class="build-run"><div class="build-backdrop" hidden>
+    ${chapters.map(([key],i)=>`<img class="build-frame" data-build-frame="${key}" src="${buildImage(key)}" alt="" ${i===0?'style="opacity:1"':''} loading="lazy" decoding="async">`).join('')}
+    <div class="build-caption"><p data-build-title>${chapters[0][2]}</p><p data-build-copy>${chapters[0][3]}</p></div>
+  </div>
+  <div class="build-chapters">${chapters.map(([key,label,title,copy])=>`<figure class="build-chapter">
+    <img src="${buildImage(key)}" alt="${title}" loading="lazy" decoding="async" width="768" height="512">
+    <figcaption><strong>${label}.</strong> ${copy}</figcaption>
+  </figure>`).join('')}</div></div>
+  <div class="build-end"><div><h2>Дом 89</h2><p>Три спальни и 80,1 м² внутри. Этапы строительства показаны на иллюстрациях.</p></div>
+    <div class="buttons">${action('quiz/?model=89','Хочу такой дом')}<a href="projects/dom-89/">План дома</a><a href="assets/editorial/build-preview.mp4?v=9">Смотреть ролик</a></div>
+  </div>
 </section>`;
 const technical = `<div class="spec-strip"><div><strong>230 мм</strong><span>Наружная стена</span></div><div><strong>120 мм</strong><span>Перегородка</span></div><div><strong>350 мм</strong><span>Панель покрытия</span></div></div><p>Толщина изделий по каталогу Тетрики. Состав, узлы и опирание уточняются под конкретный проект.</p>${grid([
   card(e('technical-06.webp'),'Армирование','Схема из презентации Тетрики, лист 6.',editorial('technical-06','Лист Тетрики о матричном армировании')),
   card(e('technical-07.webp'),'Логистика','Схема из презентации Тетрики, лист 7.',editorial('technical-07','Лист Тетрики о перевозке панелей')),
   card(e('technical-10.webp'),'Сборка','Фото и схема из презентации Тетрики, лист 10.',editorial('technical-10','Лист Тетрики о монтаже')),
 ])}<p>${action('technology/','Подробнее о технологии')}</p>`;
-const routes = [
-  ['projects/','Дома для жизни','Планы и комплектации'],
-  ['dohodnye-doma/','Доходные дома','Здания с несколькими квартирами для аренды'],
-  ['gostevye-doma/','Гостевые дома','От одного домика до группы на участке'],
-  ['land/','Земельный участок','Проверка и подбор'],
-  ['architecture/','Архитектура','Open Life, Soft и Resort'],
-  ['invest/','Инвестору','Вложения, расходы и сценарии'],
-];
 const collections = [
   ['open-life','Open Life','Чистые линии, широкие проёмы и прямой выход на террасу.','open-life'],
   ['soft','Soft','Мягкие углы, светлый фасад и спокойный ритм окон.','soft'],
@@ -97,18 +94,15 @@ const advantages = `<dl class="sales-points">
 </dl><p>Сравниваете с СИП или каркасом? Сопоставьте одинаковую комплектацию, характеристики стены и состав работ по смете.</p>${action('technology/compare/','Как сравнить технологии')}`;
 add('index.html','Частные, доходные и гостевые дома в Крыму','Дом за лето строит дома для жизни и проектирует доходные и гостевые дома из заводских панелей.',`
   <section class="opening home-editorial">
-    <div class="opening-copy"><p class="tag">Дома из заводских панелей</p><h1>Свой дом<br>в Крыму.</h1><p>Строим дома для жизни. Проектируем доходные дома и гостевые комплексы под ваш участок.</p><div class="buttons">${action('quiz/','Подобрать дом')}<a class="quiet" href="dohodnye-doma/">Доходные дома ↗</a></div></div>
+    <div class="opening-copy"><p class="tag">Дома из заводских панелей</p><h1>Свой дом<br>в Крыму.</h1><p>Строим дома для жизни. Проектируем доходные дома и гостевые комплексы под ваш участок.</p><div class="buttons">${action('quiz/','Выбрать свой дом')}<a class="quiet" href="dohodnye-doma/">Доходные дома ↗</a></div></div>
     <figure><img src="assets/house89-daylight-1100.webp" srcset="assets/house89-daylight-640.webp 640w, assets/house89-daylight-1100.webp 1100w" sizes="(max-width: 740px) 100vw, 62vw" alt="Фасад Дома 89 на визуализации из КП" fetchpriority="high" decoding="async"><figcaption>Дом 89 · проектная визуализация</figcaption></figure>
   </section>
-  <nav class="route-grid home-routes" aria-label="Разделы сайта">${routes.map(([url,name,copy])=>`<a href="${url}"><strong>${name} <span aria-hidden="true">↗</span></strong><span>${copy}</span></a>`).join('')}</nav>
-  <section class="band home-intro"><div><p class="tag">Дом 89 · от эскиза до фасада</p><h2>Как собирается дом</h2></div><p>Листайте, чтобы пройти путь от чертежа до готового фасада. При прокрутке вверх история идёт обратно.</p></section>
   ${scene}
-  <section class="band home-projects"><div class="home-section-heading"><div><p class="tag">Каталог</p><h2>Четыре дома для жизни</h2></div><a href="projects/">Смотреть каталог ↗</a></div>${houseCards()}</section>
+  <section class="band home-projects"><div class="home-section-heading"><div><p class="tag">Каталог</p><h2>Наши дома</h2></div><a href="objects/">Проекты и фото строительства ↗</a></div>${houseCards()}</section>
   ${section('Почему заводские панели',advantages)}
-  ${section('Архитектура Тетрики',`<p class="lede">Прямая геометрия Open Life, мягкие формы Soft и арочные фасады Resort.</p>${collectionCards()}`)}
-  ${section('Узнайте, с чего начать',`<p class="lede">Расскажите о планах и участке. Покажем варианты, с которых можно начать.</p>${action('quiz/','Подобрать дом')}`)}
+  <section class="band estimate-callout"><div><h2>Рассчитайте свой проект</h2><p>Введите длину, ширину и этажность. Получите ориентир по площади и передайте его для расчёта сметы.</p></div>${action('calculator/','Рассчитать габариты')}</section>
 `,{script:'build-scene.js'});
-add('projects/index.html','Проекты домов','Проекты 89 и 110, компактные концепции 64 и 62 м².',lead('Каталог','Дома для жизни','Планировки с двумя и тремя спальнями. Выберите, как хотите жить и какой уровень готовности вам нужен.')+section('Выбрать дом',houseCards()));
+add('projects/index.html','Проекты домов','Планировки и комплектации домов 89 и 110.',lead('Каталог','Дома для жизни','Планировки с двумя и тремя спальнями. Выберите, как хотите жить и какой уровень готовности вам нужен.')+section('Выбрать дом',houseCards())+section('Проект в разработке',`<p>Компактный Дом 64 м². Планировка и смета готовятся.</p>${action('projects/dom-8x8/','О концепции 64 м²')}`));
 for(const [id,h] of Object.entries(assets)) {
   add(`projects/dom-${id}/index.html`,`Дом ${id}`,h.desc,lead('Проект дома',`Дом ${id}`,`${h.area} м² внутри. ${h.desc}`,action(`quiz/?model=${id}`,'Рассчитать для участка'))+
     `<div class="wide-media">${image('assets/'+h.photo,'Фасадный визуал из архива проекта',true)}</div>`+
@@ -117,15 +111,10 @@ for(const [id,h] of Object.entries(assets)) {
     section('Как проходит стройка',`<p>Сначала проверяем участок и условия монтажа. Затем согласуем проект, состав работ и график.</p>${action('construction/','Посмотреть этапы')}`)+(id==='89'?scene:''),{script:id==='89'?'build-scene.js':''});
 }
 add('projects/dom-8x8/index.html','Дом 64 м² · Заходи и живи','Компактный одноэтажный дом с двумя спальнями, террасой и вариантом пристройки.',lead('Концепция · 64 м² по габариту','Дом 64 м²','Две спальни и кухня-гостиная в одноэтажном доме. Основа — квадрат 8 × 8 м. Террасу можно предусмотреть отдельным этапом.', action('quiz/?model=8x8','Обсудить планировку'))+
-  `<figure class="wide-media project-cover"><img src="assets/editorial/house-8x8.webp" srcset="assets/editorial/house-8x8-small.webp 660w, assets/editorial/house-8x8.webp 1200w" sizes="88vw" alt="Концептуальный фасад дома 64 м²" fetchpriority="high" decoding="async"><figcaption>Авторская визуализация концепции 8 × 8, 64 м² по наружному габариту. Проёмы и детали фасада уточняются при проектировании.</figcaption></figure>`+
   section('Как устроен дом',`<p class="lede">Цель эскиза — около 54 м² полезной площади. В задании две отдельные спальни, общая зона, ванная и туалет, гардероб и котельная.</p><figure class="room-program"><div class="room-grid"><span>Спальня 1</span><span>Спальня 2</span><span class="living">Кухня-гостиная</span><span>Гардероб</span><span>Котельная</span><span>Ванная</span><span>Туалет</span></div><figcaption>Состав помещений. Расположение, размеры и проходы уточняются на эскизе.</figcaption></figure>`)+
   section('Заходи и живи',`<p>В составе сметы проверим отделку, кухню, мебель, технику, свет, сантехнику, отопление и наружные подключения. Состав и цена будут согласованы по проекту.</p>`)+
   section('Два варианта для участка',`<div class="compact-options"><article><h3>Дом 64 м²</h3><p>Две изолированные спальни, общая кухня-гостиная, гардероб и котельная. Ванную и туалет планируем раздельно.</p></article><article><h3>Дом с террасой</h3><p>Открытая терраса со стороны кухни-гостиной. Её площадь и стоимость считаются отдельно, 64 м² относятся к контуру дома.</p></article></div><p>Планировка и смета в разработке.</p>`)+
   section('Терраса и пристройка',`<p>Терраса задумана как отдельный этап. Для пристройки проектировщик проверит место, примыкание, конструкцию и запас инженерии.</p>${action('land/check/','Проверить участок')}`));
-add('projects/dom-62/index.html','Дом 62 м²','Эскиз одноэтажного дома 62 м² с односкатной крышей.',
- lead('Концепция · 62 м² по наружному контуру','Дом 62 м²','Компактный одноэтажный дом с односкатной крышей. Проектируем для участка, где важен небольшой габарит.',action('quiz/?model=62','Обсудить проект'))+
- `<figure class="wide-media project-cover">${editorial('house-62','Концепция дома 62 м² с односкатной крышей')}<figcaption>Архитектурная визуализация. Планировка, узлы крыши и смета в разработке.</figcaption></figure>`+
- section('Что можно выбрать',readinessCards+`<p>Состав и доступность комплектаций подтвердим после проектирования.</p>`));
 const mortgageForm = (price) => `<form class="tool" data-calculator="mortgage" data-model="${price===7800000?89:110}"><div class="fields">
 <label>Стоимость дома, ₽<input name="cost" type="number" min="1" required value="${price}"></label><label>Собственные средства, ₽<input name="deposit" type="number" min="0" required value="${price-6000000}"></label>
 <label>Ставка, % годовых<input name="rate" type="number" min="0" max="100" step=".01" required value="6"></label><label>Срок, лет<input name="years" type="number" min="1" max="50" required value="30"></label>
@@ -203,8 +192,11 @@ add('production/index.html','Производство панелей','Заво�
  lead('Производство','Как устроен заводской дом','Панели проектируют под конкретный дом и готовят до монтажа. По проекту согласуют проёмы, стыки и опирание.')+
  `<div class="wide-media">${image('assets/factory.webp','Материал о производстве из архива сайта')}</div>`+
  section('Панели и монтаж',technical)+section('От проекта к площадке',`<ol class="checklist"><li>Согласование планов, геометрии и инженерных проёмов.</li><li>Изготовление и проверка элементов по рабочим документам.</li><li>Доставка, монтаж и контроль соединений.</li></ol>${action('technology/','Читать о технологии')} ${action('objects/','Смотреть фото монтажа')}`));
-add('objects/index.html','Объекты и монтаж','Документальные фотографии монтажа дома 80 м² из архива Тетрики.',
- lead('Объекты','Монтаж дома 80 м²','Фото предоставлены в архиве производителя Тетрика. Кадры показывают стадию монтажа.')+section('Фото с площадки',galleryItems(gallery.filter(([key])=>key.startsWith('montage'))))+section('Следующие этапы',action('construction/','Как строим')));
+add('objects/index.html','Наши дома','Дома 89 и 110, архитектурные направления и фотографии монтажа панелей из архива Тетрики.',
+ lead('Проекты и стройка','Наши дома','Выберите проект или архитектуру. Ниже — реальные кадры сборки панельного дома на площадке.',action('quiz/','Выбрать свой дом'))+
+ section('Проекты и архитектура',houseCards())+
+ section('Монтаж дома 80 м²',`<p>Фотографии с площадки из архива производителя Тетрика.</p>${galleryItems(gallery.filter(([key])=>key.startsWith('montage')))}`)+
+ section('Дома по вашему заданию',action('calculator/','Рассчитать габариты')));
 add('architecture/index.html','Архитектура домов','Три направления архитектуры Тетрики: Open Life, Soft и Resort.',
   lead('Архитектура','Три характера дома','Посмотрите, как форма фасада, окна и отделка меняют впечатление от дома.')+section('Коллекции',collectionCards()));
 for (const [id,title,description,photo] of collections) {
@@ -239,6 +231,20 @@ for(const [key,title,copy,more] of book) {
     section('Следующий шаг',action(key==='ipoteka'?'mortgage/':key==='arenda'?'invest/calculator/':key==='komplektaciya'?'equipment/':'land/check/',key==='ipoteka'?'Калькулятор ипотеки':key==='arenda'?'Рассчитать аренду':key==='komplektaciya'?'Посмотреть комплектации':'Проверить участок')));
 }
 const packages = [['Домокомплект',2278000,2745000],['Коробка на фундаменте клиента',3934000,4558000],['Коробка с окнами',4362000,4972000],['Тепловой контур',5353000,6187000],['Готовность к инженерии',5943000,6887000],['Предчистовая с инженерией',7800000,8800000],['Чистовая отделка',8580000,9680000],['Отделка и мебель',9360000,10560000]];
+add('calculator/index.html','Калькулятор габаритов дома','Предварительный расчёт площади, пятна застройки и периметра по длине, ширине и этажности.',
+ lead('Индивидуальный проект','Рассчитать габариты дома','Укажите наружные размеры. Для расчёта сметы также понадобятся планировка, участок и комплектация.')+
+ section('Габариты',`<form class="tool" data-calculator="dimensions">
+ <div class="fields"><label>Длина, м<input name="length" type="number" min="1" step="0.01" required value="8"></label>
+ <label>Ширина, м<input name="width" type="number" min="1" step="0.01" required value="8"></label>
+ <label>Этажность<select name="floors"><option value="1">Один этаж</option><option value="2">Два этажа одинакового габарита</option></select></label>
+ <label>Готовность<select name="readiness">${readiness.map(([title])=>`<option>${title}</option>`).join('')}</select></label></div>
+ <button class="action" type="submit">Рассчитать</button>
+ <div data-dimensions-result hidden><dl class="sales-points"><div><dt>Пятно дома</dt><dd><output name="footprint"></output></dd></div><div><dt>Площадь по наружному контуру</dt><dd><output name="gross"></output></dd></div><div><dt>Периметр основания</dt><dd><output name="perimeter"></output></dd></div></dl>
+ <p>Расчёт для прямоугольного контура. Полезную площадь определяем по планировке, цену — по проекту и участку.</p>
+ <div class="buttons"><a class="action" data-dimensions-request href="sms:+79787245424">Запросить смету по SMS</a><a href="tel:+79787245424">Позвонить</a></div></div></form>`),{script:'full-site.js'});
+add('contacts/index.html','Контакты','Связаться с командой «Дом за лето» по строительству домов в Крыму.',
+ lead('Связаться с нами','Контакты «Дом за лето»','Обсудим проект, комплектацию и условия строительства на вашем участке.')+
+ section('Телефон и сообщения',`<div class="contact-card"><a class="contact-number" href="tel:+79787245424">+7 978 724-54-24</a><div class="buttons">${action('tel:+79787245424','Позвонить')}<a href="sms:+79787245424">Написать SMS</a></div></div>`));
 add('technology/compare/index.html','Панельный дом, СИП и каркас · Что сравнить','Сравнение стройки по конструкции, смете, влажности и контролю монтажа.',
  lead('Технология','За что вы платите в смете','Сравните одинаковый уровень готовности и посмотрите, какие параметры подтверждены документами.')+
  section('Четыре проверки перед выбором',`<dl class="sales-points"><div><dt>Состав стены и узлы</dt><dd>Запросите разрез стены, утепление, схему примыканий, расчётные характеристики и проектные ограничения.</dd></div><div><dt>Влажность и защита</dt><dd>Для деревянных конструкций проверьте влажность материала, условия хранения и защиту от намокания. Для панелей — гидроизоляцию и герметизацию стыков по проекту.</dd></div><div><dt>Готовность и добавки</dt><dd>Сопоставьте фундамент, кровлю, окна, инженерию, доставку и монтаж на одной стадии готовности.</dd></div><div><dt>Контроль монтажа</dt><dd>Уточните, что принимается на заводе, что проверяется на участке и кто отвечает за исправления.</dd></div></dl>${action('equipment/','Сравнить готовность домов')}`));
@@ -249,15 +255,16 @@ add('equipment/index.html','Комплектации и инженерия','С�
  section('Ступени готовности',`<div class="table-wrap"><table><thead><tr><th>Пакет</th><th>Дом 89</th><th>Дом 110</th></tr></thead><tbody>${packages.map(([n,a,b])=>`<tr><th scope="row">${n}</th><td>${a.toLocaleString('ru-RU')} ₽</td><td>${b.toLocaleString('ru-RU')} ₽</td></tr>`).join('')}</tbody></table></div><p>Землю, нестандартные работы и дополнительные подключения уточняем по смете.</p>`),{script:'full-site.js'});
 
 export function buildFullSite({write,seo,escape}) {
+  write('projects/dom-62/index.html','<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0;url=../index.html"><title>Проекты домов · Дом за лето</title></head><body><a href="../index.html">Перейти в каталог</a></body></html>');
   for (const {file,title,description,body,script} of entries) {
     const base = '../'.repeat(file.split('/').length-1)||'./';
     const here = file.replace(/index.html$/,'');
-    const menu = [['projects/','Дома'],['dohodnye-doma/','Доходные дома'],['gostevye-doma/','Гостевые дома'],['architecture/','Архитектура'],['land/','Участки'],['invest/','Инвестору']];
+    const menu = [['objects/','Наши дома'],['dohodnye-doma/','Доходные дома'],['gostevye-doma/','Гостевые дома'],['architecture/','Архитектура'],['land/','Участки'],['invest/','Инвестору'],['calculator/','Калькулятор'],['contacts/','Контакты']];
     const links = menu.map(([url,name])=>`<a href="${url}"${here===url?' aria-current="page"':''}>${name}</a>`).join('');
-    const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><base href="${base}"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)} · Дом за лето</title><meta name="description" content="${escape(description)}"><meta name="theme-color" content="#24372e"><link rel="icon" href="assets/logo.webp"><link rel="stylesheet" href="full-site.css?v=income1">${seo(file,title,description,here.startsWith('journal/')&&here!=='journal/')}</head><body>
-    <header class="top"><a class="brand" href="./">${image('assets/logo.webp','',true)}<b>Дом за лето</b></a><nav aria-label="Меню сайта">${links}</nav><a class="top-cta" href="quiz/">Подобрать дом ↗</a></header>
+    const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><base href="${base}"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)} · Дом за лето</title><meta name="description" content="${escape(description)}"><meta name="theme-color" content="#24372e"><link rel="icon" href="assets/logo.webp"><link rel="stylesheet" href="full-site.css?v=geometry1">${seo(file,title,description,here.startsWith('journal/')&&here!=='journal/')}</head><body>
+    <header class="top"><a class="brand" href="./">${image('assets/logo.webp','',true)}<b>Дом за лето</b></a><nav aria-label="Меню сайта">${links}</nav><div class="top-actions"><a class="top-phone" href="tel:+79787245424">+7 978 724-54-24</a><a class="top-cta" href="quiz/">Выбрать свой дом ↗</a></div></header>
     <main>${body}</main>
-    <footer class="foot"><div class="foot-brand"><a class="brand" href="./">${image('assets/logo.webp','')}<b>Дом за лето</b></a><p>Частные, доходные и гостевые дома в Крыму</p><a href="tel:+79787245424">+7 978 724-54-24</a></div><nav aria-label="Разделы">${links}<a href="production/">Производство</a><a href="technology/">Технология</a><a href="construction/">Как строим</a><a href="equipment/">Комплектации</a><a href="configure/">Конфигуратор</a></nav><div class="foot-bottom"><span>Дом за лето · Крым · 2026</span><span>Стоимость и состав работ подтверждаются по проекту и участку.</span></div></footer>${script?`<script src="${script}?v=income1" defer></script>`:''}</body></html>`;
+    <footer class="foot"><div class="foot-brand"><a class="brand" href="./">${image('assets/logo.webp','')}<b>Дом за лето</b></a><p>Частные, доходные и гостевые дома в Крыму</p><a href="tel:+79787245424">+7 978 724-54-24</a></div><nav aria-label="Разделы">${links}<a href="projects/">Каталог проектов</a><a href="production/">Производство</a><a href="technology/">Технология</a><a href="construction/">Как строим</a><a href="equipment/">Комплектации</a><a href="configure/">Конфигуратор</a></nav><div class="foot-bottom"><span>Дом за лето · Крым · 2026</span><span>Стоимость и состав работ подтверждаются по проекту и участку.</span></div></footer>${script?`<script src="${script}?v=geometry1" defer></script>`:''}</body></html>`;
     write(file, html.replace(/(<a [^>]*?)href="(\.\/|[a-z0-9-]+(?:\/[a-z0-9-]+)*\/)((?:[?#][^"]*)?)"/g, '$1href="$2index.html$3"'));
   }
   return entries.map(({file})=>file.replace(/index.html$/,''));

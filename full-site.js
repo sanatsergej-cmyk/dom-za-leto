@@ -24,6 +24,32 @@ function choose(select,key) {
 }
 const mortgage = document.querySelector('[data-calculator="mortgage"]');
 const smsLink = text => `sms:+79787245424?body=${encodeURIComponent(text)}`;
+const dimensions = document.querySelector('[data-calculator="dimensions"]');
+if (dimensions) {
+  const result = dimensions.querySelector('[data-dimensions-result]');
+  const format = new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2});
+  dimensions.addEventListener('input', () => { result.hidden = true; });
+  dimensions.addEventListener('submit', event => {
+    event.preventDefault();
+    const length = number(dimensions,'length');
+    const width = number(dimensions,'width');
+    const floors = number(dimensions,'floors');
+    const footprint = length*width;
+    const gross = footprint*floors;
+    const perimeter = 2*(length+width);
+    if (![footprint,gross,perimeter].every(Number.isFinite)) {
+      result.hidden = true;
+      return;
+    }
+    control(dimensions,'footprint').value = `${format.format(footprint)} м²`;
+    control(dimensions,'gross').value = `${format.format(gross)} м²`;
+    control(dimensions,'perimeter').value = `${format.format(perimeter)} м`;
+    const readiness = control(dimensions,'readiness').value;
+    dimensions.querySelector('[data-dimensions-request]').href = smsLink(`Здравствуйте! Прошу рассчитать смету дома. Габариты: ${format.format(length)} × ${format.format(width)} м. Этажей: ${floors}. Площадь по контуру: ${format.format(gross)} м². Готовность: ${readiness}.`);
+    result.hidden = false;
+    control(dimensions,'footprint').setAttribute('aria-live','polite');
+  });
+}
 if (mortgage) {
   const request = mortgage.querySelector('[data-mortgage-request]');
   function mortgageEstimate() {
@@ -170,7 +196,7 @@ if (quiz) {
   const progress = quiz.querySelector('[data-progress]');
   const selection = quiz.querySelector('[data-quiz-selection]');
   const requested = params.get('model');
-  const initialModels = {'89':'Дом 89','110':'Дом 110','8x8':'Дом 64 м²','62':'Дом 62 м²'};
+  const initialModels = {'89':'Дом 89','110':'Дом 110','8x8':'Дом 64 м²'};
   if (Object.hasOwn(initialModels,requested)) {
     selection.textContent = `Выбранный проект · ${initialModels[requested]}`;
     selection.hidden = false;
@@ -218,7 +244,7 @@ if (quiz) {
   function showResult() {
     const data = values();
     const rental = data.units==='5'?'5':data.units==='6'?'6':'4m';
-    const home = data.bedrooms==='2'?(requested==='62'?'62':'8x8'):data.feature==='privacy'?'110':data.bedrooms==='3'&&['8x8','62'].includes(requested)?'89':Object.hasOwn(initialModels,requested)?requested:'89';
+    const home = data.bedrooms==='2'?'8x8':data.feature==='privacy'?'110':data.bedrooms==='3'&&requested==='8x8'?'89':Object.hasOwn(initialModels,requested)?requested:'89';
     const recommendations = [];
     if (data.goal==='guest') recommendations.push(['gostevye-doma/','Гостевые дома'],['architecture/resort/','Архитектура Resort']);
     else {

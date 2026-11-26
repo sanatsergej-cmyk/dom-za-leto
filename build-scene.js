@@ -1,57 +1,68 @@
 for (const story of document.querySelectorAll('.build-story')) {
-  const chapters = [...story.querySelectorAll('[data-build-chapter]')];
+  const run = story.querySelector('.build-run');
+  const backdrop = story.querySelector('.build-backdrop');
   const frames = [...story.querySelectorAll('[data-build-frame]')];
-  const navigation = story.querySelector('.build-nav');
-  const buttons = [...navigation.querySelectorAll('button')];
+  const captions = [...story.querySelectorAll('.build-chapter figcaption')];
+  const titles = [...story.querySelectorAll('.build-chapter img')].map(img => img.alt);
+  const title = story.querySelector('[data-build-title]');
+  const copy = story.querySelector('[data-build-copy]');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  let active = -1;
-  let previous = -1;
-  let cleanup;
-  let pending = false;
+  const clamp = value => Math.max(0,Math.min(1,value));
+  let requested = 0;
+  let displayed = 0;
+  let pending = 0;
+  let lastTime = 0;
+  let previousCaption = -1;
 
-  function update() {
-    pending = false;
-    const midpoint = window.innerHeight * .56;
-    const index = Math.max(0, chapters.findLastIndex(chapter => chapter.getBoundingClientRect().top <= midpoint));
-    if (index === active) return;
-    previous = active;
-    active = index;
-    clearTimeout(cleanup);
-    frames.forEach((frame,i) => {
-      frame.toggleAttribute('data-outgoing',i === previous);
-      frame.toggleAttribute('data-active',i === index);
-      if (i === index) buttons[i].setAttribute('aria-current','step');
-      else buttons[i].removeAttribute('aria-current');
-    });
-    if (previous >= 0) {
-      const outgoing = frames[previous];
-      cleanup = setTimeout(() => outgoing.removeAttribute('data-outgoing'), 500);
-    }
+  function setCaption(index) {
+    if (index === previousCaption) return;
+    previousCaption = index;
+    title.textContent = titles[index];
+    copy.textContent = captions[index].lastChild.textContent.trim();
   }
 
-  function schedule() {
-    if (pending || reduced.matches) return;
-    pending = true;
-    requestAnimationFrame(update);
+  function paint(time) {
+    pending = 0;
+    const duration = lastTime ? Math.min(time-lastTime,32) : 16;
+    const remaining = requested-displayed;
+    displayed = Math.abs(remaining)<.002 ? requested : displayed+remaining*(1-Math.exp(-duration/80));
+    lastTime = time;
+    const position = displayed*(frames.length-1);
+    const index = Math.floor(position);
+    const fraction = clamp((position-index-.12)/.76);
+    const nextFrame = frames[index+1];
+    const shownIndex = frames[index].naturalWidth ? index : frames.findIndex(frame => frame.naturalWidth);
+    frames.forEach((frame,i)=>{
+      const mix = nextFrame?.naturalWidth && shownIndex===index ? fraction : 0;
+      const isNext = i===index+1 && mix>0;
+      frame.style.opacity = i===shownIndex ? '1' : isNext ? String(mix*mix*(3-2*mix)) : '0';
+      frame.style.zIndex = isNext ? '2' : '1';
+    });
+    setCaption(index+Number(Boolean(nextFrame?.naturalWidth && fraction>=.5)));
+    if (displayed!==requested) pending=requestAnimationFrame(paint);
+    else lastTime=0;
+  }
+
+  function trackScroll() {
+    if (reduced.matches) return;
+    const travel=run.offsetHeight-backdrop.offsetHeight;
+    if(travel<=0) return;
+    requested=clamp(-run.getBoundingClientRect().top/travel);
+    if (!pending) pending=requestAnimationFrame(paint);
   }
 
   function applyMode() {
+    cancelAnimationFrame(pending);
+    pending=0;
+    lastTime=0;
     story.classList.toggle('is-enhanced',!reduced.matches);
-    navigation.hidden = reduced.matches;
-    active = -1;
-    clearTimeout(cleanup);
-    frames.forEach(frame => frame.removeAttribute('data-outgoing'));
-    schedule();
+    backdrop.hidden=reduced.matches;
+    trackScroll();
   }
 
-  buttons.forEach((button,i) => button.addEventListener('click', () => {
-    chapters[i].scrollIntoView({block:'start'});
-    chapters[i].querySelector('h2').focus({preventScroll:true});
-    schedule();
-  }));
-
-  addEventListener('scroll', schedule, {passive:true});
-  addEventListener('resize', schedule);
-  reduced.addEventListener('change', applyMode);
+  frames.forEach(frame=>frame.addEventListener('load',trackScroll,{once:true}));
+  addEventListener('scroll',trackScroll,{passive:true});
+  addEventListener('resize',trackScroll);
+  reduced.addEventListener('change',applyMode);
   applyMode();
 }
