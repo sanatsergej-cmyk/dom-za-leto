@@ -11,6 +11,7 @@ for (const run of document.querySelectorAll('.build-run')) {
   const sequence = run.querySelector('.build-sequence');
   const canvas = sequence.getContext('2d', { alpha: false });
   const sheet = new Image();
+  sheet.fetchPriority = 'high';
   const stages = [...run.querySelectorAll('[data-stage-time]')].map(element => ({
     element,
     path: element.querySelector('.build-road-progress'),
@@ -26,6 +27,7 @@ for (const run of document.querySelectorAll('.build-run')) {
   let sourcesLoaded = false;
   let inView = false;
   let sheetLoaded = false;
+  let videoLoadTimer = 0;
   let lastSequenceFrame = -1;
   let frameCallback = 0;
 
@@ -54,7 +56,7 @@ for (const run of document.querySelectorAll('.build-run')) {
   }
 
   function trackVideoFrame() {
-    if (frameCallback || !inView || motionPreference.matches || !video.requestVideoFrameCallback) return;
+    if (frameCallback || !inView || !sourcesLoaded || motionPreference.matches || !video.requestVideoFrameCallback) return;
     frameCallback = video.requestVideoFrameCallback((_time, { mediaTime }) => {
       frameCallback = 0;
       presentedTime = mediaTime;
@@ -98,12 +100,14 @@ for (const run of document.querySelectorAll('.build-run')) {
     if (!frame) frame = requestAnimationFrame(paint);
   }
 
-  function load() {
-    if (!sheet.src) sheet.src = sequence.dataset.frames;
-    if (motionPreference.matches || sourcesLoaded || !video.canPlayType('video/mp4') || !video.requestVideoFrameCallback) return;
+  function loadVideo() {
+    clearTimeout(videoLoadTimer);
+    videoLoadTimer = 0;
+    if (!inView || motionPreference.matches || sourcesLoaded || !video.canPlayType('video/mp4') || !video.requestVideoFrameCallback) return;
     sourcesLoaded = true;
     video.preload = 'auto';
     video.src = portrait.matches ? video.dataset.videoSmall : video.dataset.videoSrc;
+    trackVideoFrame();
   }
 
   function stopVideoTracking() {
@@ -120,7 +124,9 @@ for (const run of document.querySelectorAll('.build-run')) {
       presentedTime = -Infinity;
     }
     if (inView) {
-      load();
+      if (!sheet.src) sheet.src = sequence.dataset.frames;
+      if (sheetLoaded || (sheet.complete && !sheet.naturalWidth)) loadVideo();
+      else if (!videoLoadTimer && !sourcesLoaded && !motionPreference.matches) videoLoadTimer = setTimeout(loadVideo, 4000);
       trackVideoFrame();
       track();
     }
@@ -130,7 +136,9 @@ for (const run of document.querySelectorAll('.build-run')) {
   sheet.addEventListener('load', () => {
     sheetLoaded = true;
     draw();
+    loadVideo();
   });
+  sheet.addEventListener('error', loadVideo);
   const observer = new IntersectionObserver(([entry]) => {
     inView = entry.isIntersecting;
     if (inView) configure();
