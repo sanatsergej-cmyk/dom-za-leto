@@ -13,6 +13,7 @@ for (const story of document.querySelectorAll('.build-story')) {
   let pending = 0;
   let lastTime = 0;
   let previousCaption = -1;
+  let heldIndex = 0;
 
   function setCaption(index) {
     if (index === previousCaption) return;
@@ -31,14 +32,15 @@ for (const story of document.querySelectorAll('.build-story')) {
     const index = Math.floor(position);
     const fraction = clamp((position-index-.12)/.76);
     const nextFrame = frames[index+1];
-    const shownIndex = frames[index].naturalWidth ? index : frames.findIndex(frame => frame.naturalWidth);
+    const shownIndex = frames[index].naturalWidth ? index : heldIndex;
+    const mix = nextFrame?.naturalWidth && shownIndex===index ? fraction : 0;
     frames.forEach((frame,i)=>{
-      const mix = nextFrame?.naturalWidth && shownIndex===index ? fraction : 0;
       const isNext = i===index+1 && mix>0;
       frame.style.opacity = i===shownIndex ? '1' : isNext ? String(mix*mix*(3-2*mix)) : '0';
       frame.style.zIndex = isNext ? '2' : '1';
     });
-    setCaption(index+Number(Boolean(nextFrame?.naturalWidth && fraction>=.5)));
+    heldIndex = mix>=.5 ? index+1 : shownIndex;
+    setCaption(heldIndex);
     if (displayed!==requested) pending=requestAnimationFrame(paint);
     else lastTime=0;
   }

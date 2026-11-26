@@ -7,7 +7,7 @@ const models = JSON.parse(read('content/invest-models.json'));
 const landListings = JSON.stringify(JSON.parse(read('content/land-listings.json'))).replace(/</g, '\\u003c');
 const image = (src, alt, eager = false) => `<img src="${src}" alt="${alt}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
 const editorial = (name, alt) => image(`assets/editorial/${name}.webp`, alt);
-const action = (url, label) => `<a class="action" href="${url}">${label} <span aria-hidden="true">↗</span></a>`;
+const action = (url, label, tone = 'primary') => `<a class="action action--${tone}" href="${url}">${label}<span class="action-arrow" aria-hidden="true">↗</span></a>`;
 const card = (url, title, copy, media = '') => `<article class="tile">${media}<div><h3><a href="${url}">${title}</a></h3><p>${copy}</p></div></article>`;
 const section = (title, body) => `<section class="band"><h2>${title}</h2>${body}</section>`;
 const grid = (items) => `<div class="tile-grid">${items.join('')}</div>`;
@@ -58,7 +58,7 @@ const chapters = [
 const buildImage = key => key==='facade'?'assets/house89-daylight-1100.webp':e('build-'+key+'.webp');
 const scene = `<section class="build-story" id="stages" aria-label="Как строится Дом 89">
   <div class="build-run"><div class="build-backdrop" hidden>
-    ${chapters.map(([key],i)=>`<img class="build-frame" data-build-frame="${key}" src="${buildImage(key)}" alt="" ${i===0?'style="opacity:1"':''} loading="lazy" decoding="async">`).join('')}
+    ${chapters.map(([key],i)=>`<img class="build-frame" data-build-frame="${key}" src="${buildImage(key)}" alt="" ${i===0?'style="opacity:1"':''} loading="lazy" fetchpriority="low" decoding="async">`).join('')}
     <div class="build-caption"><p data-build-title>${chapters[0][2]}</p><p data-build-copy>${chapters[0][3]}</p></div>
   </div>
   <div class="build-chapters">${chapters.map(([key,label,title,copy])=>`<figure class="build-chapter">
@@ -100,16 +100,48 @@ const dimensionsForm = `<form class="tool" data-calculator="dimensions">
  <div data-dimensions-result hidden><dl class="sales-points"><div><dt>Пятно дома</dt><dd><output name="footprint"></output></dd></div><div><dt>Площадь по наружному контуру</dt><dd><output name="gross"></output></dd></div><div><dt>Периметр основания</dt><dd><output name="perimeter"></output></dd></div></dl>
  <p>Расчёт для прямоугольного контура. Полезную площадь определяем по планировке, цену — по проекту и участку.</p>
  <div class="buttons"><a class="action" data-dimensions-request href="sms:+79787245424">Запросить смету по SMS</a><a href="tel:+79787245424">Позвонить</a></div></div></form>`;
+const landscapeCard = `<section class="place-feature" aria-labelledby="place-title">
+  <figure>${editorial('fiolent-project','Мыс Фиолент: море, светлый камень и склон')}<figcaption>Мыс Фиолент · <a href="credits.html">Источник фото</a></figcaption></figure>
+  <div class="place-copy">
+    <h2 id="place-title">Дом начинается<br>с участка</h2>
+    <p>Где открывается вид? Как заедет кран? Где удобнее поставить дом и вывести террасу? Начинаем проект с этих вопросов.</p>
+    <div class="buttons">${action('land/check/','Проверить участок')}${action('land/search/','Подобрать участок','outline')}</div>
+  </div>
+</section>`;
+const rentalAndGuest = `<section class="band home-directions" aria-labelledby="direction-title">
+  <h2 id="direction-title">Дома для аренды и отдыха</h2>
+  <div class="direction-grid">
+    <article class="direction-card">${editorial('rental-direction','Визуализация секционного доходного дома')}<div><h3>Доходные дома</h3><p>Несколько квартир в одном здании. Подбираем квартирографию под участок и задачу аренды.</p>${action('dohodnye-doma/','Смотреть проекты','outline')}</div></article>
+    <article class="direction-card">${editorial('resort','Визуализация гостевых домиков с арками')}<div><h3>Гостевые дома</h3><p>От отдельного домика до комплекса. Продумываем входы, приватность, дорожки и общие зоны.</p>${action('gostevye-doma/','Смотреть варианты','outline')}</div></article>
+  </div>
+</section>`;
 add('index.html','Частные, доходные и гостевые дома в Крыму','Дом за лето строит дома для жизни и проектирует доходные и гостевые дома из заводских панелей.',`
-  <section class="opening home-editorial">
-    <div class="opening-copy"><p class="tag">Дома из заводских панелей</p><h1>Свой дом<br>в Крыму.</h1><p>Строим дома для жизни. Проектируем доходные дома и гостевые комплексы под ваш участок.</p><div class="buttons">${action('quiz/','Выбрать свой дом')}<a class="quiet" href="dohodnye-doma/">Доходные дома ↗</a></div></div>
-    <figure><img src="assets/house89-daylight-1100.webp" srcset="assets/house89-daylight-640.webp 640w, assets/house89-daylight-1100.webp 1100w" sizes="(max-width: 740px) 100vw, 62vw" alt="Фасад Дома 89 на визуализации из КП" fetchpriority="high" decoding="async"><figcaption>Дом 89 · проектная визуализация</figcaption></figure>
+  <section class="flagship-hero" aria-labelledby="flagship-title">
+    <picture class="flagship-day">
+      <img src="assets/house89-daylight-1100.webp" srcset="assets/house89-daylight-640.webp 640w, assets/house89-daylight-1100.webp 1100w, assets/house89-daylight-1440.webp 1440w" sizes="100vw" alt="Дом 89 на фоне крымских предгорий, проектная визуализация" fetchpriority="high" width="1100" height="619">
+    </picture>
+    <div class="flagship-copy">
+      <p class="flagship-location">Крым · дома из заводских панелей</p>
+      <h1 id="flagship-title">Свой дом<br>в Крыму.</h1>
+      <p>Дома для жизни, доходные дома и гостевые комплексы под ваш участок.</p>
+      <div class="buttons">${action('quiz/','Выбрать свой дом')}${action('dohodnye-doma/','Доходные дома','outline')}</div>
+    </div>
+    <div class="flagship-details">
+      <a class="flagship-project" href="projects/dom-89/"><strong>Дом 89</strong><span>80,1 м² внутри · 3 спальни</span><span class="flagship-reference">Визуализация проекта</span><span aria-hidden="true">↗</span></a>
+      <div class="flagship-light" role="group" aria-label="Освещение фасада" hidden>
+        <button type="button" data-flagship-light="day" aria-pressed="true">День</button>
+        <button type="button" data-flagship-light="dusk" aria-pressed="false">Сумерки</button>
+      </div>
+    </div>
+    <span class="flagship-status" role="status"></span>
   </section>
   ${scene}
   <section class="band home-projects"><div class="home-section-heading"><div><p class="tag">Каталог</p><h2>Наши дома</h2></div><a href="objects/">Проекты и фото строительства ↗</a></div>${houseCards()}</section>
+  ${rentalAndGuest}
+  ${landscapeCard}
   ${section('Почему заводские панели',advantages)}
   <section class="band estimate-callout" aria-labelledby="home-estimate"><div><p class="tag">Индивидуальный проект</p><h2 id="home-estimate">Рассчитайте свой дом</h2><p>Укажите наружные габариты и уровень готовности. Узнайте площадь и периметр, затем отправьте параметры для сметы.</p><a href="contacts/">Обсудить проект с нами ↗</a></div>${dimensionsForm}</section>
-`,{script:['build-scene.js','full-site.js']});
+`,{script:['build-scene.js','full-site.js','flagship.js']});
 add('projects/index.html','Проекты домов','Планировки и комплектации домов 89 и 110.',lead('Каталог','Дома для жизни','Планировки с двумя и тремя спальнями. Выберите, как хотите жить и какой уровень готовности вам нужен.')+section('Выбрать дом',houseCards())+section('Проект в разработке',`<p>Компактный Дом 64 м². Планировка и смета готовятся.</p>${action('projects/dom-8x8/','О концепции 64 м²')}`));
 for(const [id,h] of Object.entries(assets)) {
   add(`projects/dom-${id}/index.html`,`Дом ${id}`,h.desc,lead('Проект дома',`Дом ${id}`,`${h.area} м² внутри. ${h.desc}`,action(`quiz/?model=${id}`,'Рассчитать для участка'))+
@@ -264,10 +296,10 @@ export function buildFullSite({write,seo,escape}) {
     const here = file.replace(/index.html$/,'');
     const menu = [['objects/','Наши дома'],['dohodnye-doma/','Доходные дома'],['gostevye-doma/','Гостевые дома'],['architecture/','Архитектура'],['land/','Участки'],['invest/','Инвестору'],['calculator/','Калькулятор']];
     const links = menu.map(([url,name])=>`<a href="${url}"${here===url?' aria-current="page"':''}>${name}</a>`).join('');
-    const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><base href="${base}"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)} · Дом за лето</title><meta name="description" content="${escape(description)}"><meta name="theme-color" content="#24372e"><link rel="icon" href="assets/logo.webp"><link rel="stylesheet" href="full-site.css?v=layout2">${seo(file,title,description,here.startsWith('journal/')&&here!=='journal/')}</head><body>
-    <header class="top"><a class="brand" href="./"><img src="assets/logo.webp" alt="Дом за лето · Главная" width="398" height="200"></a><nav aria-label="Меню сайта">${links}</nav><div class="top-actions"><div class="top-contact"><a class="top-phone" href="tel:+79787245424">+7 978 724-54-24</a><a href="contacts/"${here==='contacts/'?' aria-current="page"':''}>Контакты</a></div><a class="top-cta" href="quiz/">Выбрать свой дом ↗</a></div></header>
+    const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><base href="${base}"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)} · Дом за лето</title><meta name="description" content="${escape(description)}"><meta name="theme-color" content="#24372e"><link rel="icon" href="assets/logo.webp"><link rel="stylesheet" href="full-site.css?v=layout2"><link rel="stylesheet" href="crimea.css?v=1">${file==='index.html'?'<link rel="stylesheet" href="flagship.css?v=2">':''}${seo(file,title,description,here.startsWith('journal/')&&here!=='journal/')}</head><body>
+    <header class="top"><a class="brand" href="./"><img src="assets/logo.webp" alt="Дом за лето · Главная" width="398" height="200"></a><nav aria-label="Меню сайта">${links}</nav><div class="top-actions"><div class="top-contact"><a class="top-phone" href="tel:+79787245424">+7 978 724-54-24</a><a href="contacts/"${here==='contacts/'?' aria-current="page"':''}>Контакты</a></div><a class="top-cta" href="quiz/">Выбрать свой дом<span class="action-arrow" aria-hidden="true">↗</span></a></div></header>
     <main>${body}</main>
-    <footer class="foot"><div class="foot-brand"><a class="brand" href="./">${image('assets/logo.webp','')}<b>Дом за лето</b></a><p>Частные, доходные и гостевые дома в Крыму</p><a href="tel:+79787245424">+7 978 724-54-24</a></div><nav aria-label="Разделы">${links}<a href="contacts/">Контакты</a><a href="projects/">Каталог проектов</a><a href="production/">Производство</a><a href="technology/">Технология</a><a href="construction/">Как строим</a><a href="equipment/">Комплектации</a><a href="configure/">Конфигуратор</a></nav><div class="foot-bottom"><span>Дом за лето · Крым · 2026</span><span>Стоимость и состав работ подтверждаются по проекту и участку.</span></div></footer>${[].concat(script).filter(Boolean).map(file=>`<script src="${file}?v=layout2" defer></script>`).join('')}</body></html>`;
+    <footer class="foot"><div class="foot-brand"><a class="brand" href="./">${image('assets/logo.webp','')}<b>Дом за лето</b></a><p>Частные, доходные и гостевые дома в Крыму</p><a href="tel:+79787245424">+7 978 724-54-24</a></div><nav aria-label="Разделы">${links}<a href="contacts/">Контакты</a><a href="projects/">Каталог проектов</a><a href="production/">Производство</a><a href="technology/">Технология</a><a href="construction/">Как строим</a><a href="equipment/">Комплектации</a><a href="configure/">Конфигуратор</a></nav><div class="foot-bottom"><span>Дом за лето · Крым · 2026</span><span>Стоимость и состав работ подтверждаются по проекту и участку.</span></div></footer>${[].concat(script).filter(Boolean).map(file=>`<script src="${file}?v=crimea1" defer></script>`).join('')}</body></html>`;
     write(file, html.replace(/(<a [^>]*?)href="(\.\/|[a-z0-9-]+(?:\/[a-z0-9-]+)*\/)((?:[?#][^"]*)?)"/g, '$1href="$2index.html$3"'));
   }
   return entries.map(({file})=>file.replace(/index.html$/,''));
