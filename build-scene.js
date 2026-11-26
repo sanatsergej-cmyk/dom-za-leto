@@ -1,108 +1,100 @@
-for (const story of document.querySelectorAll('.build-story')) {
-  const run = story.querySelector('.build-run');
-  const backdrop = story.querySelector('.build-backdrop');
-  const video = story.querySelector('.build-video');
-  const frames = [...story.querySelectorAll('[data-build-frame]')];
-  const beats = [...story.querySelectorAll('[data-build-beat]')];
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const clamp = value => Math.max(0,Math.min(1,value));
-  const beatStops = [0,.13,.30,.70,.9];
-  let requested = 0;
-  let displayed = 0;
-  let pending = 0;
+const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+const portrait = matchMedia('(max-width: 740px)');
+const clampProgress = value => Math.max(0, Math.min(1, value));
+
+for (const run of document.querySelectorAll('.build-run')) {
+  const video = run.querySelector('.build-video');
+  const stages = [...run.querySelectorAll('[data-stage-time]')].map(element => ({
+    element,
+    path: element.querySelector('.build-road-progress'),
+    time: Number(element.dataset.stageTime),
+  }));
+  const backdrop = run.querySelector('.build-backdrop');
+  let frame = 0;
   let lastTime = 0;
-  let previousBeat = 0;
-  let heldIndex = 0;
-  let wantsVideo = false;
-  let videoFailed = false;
+  let targetTime = 0;
+  let displayedTime = 0;
+  let current = 0;
+  let sourcesLoaded = false;
+  let inView = false;
+  let active = false;
 
-  function showBeat(progress) {
-    const index = beatStops.findLastIndex(start=>progress>=start);
-    if (index===previousBeat) return;
-    beats[previousBeat].hidden = true;
-    beats[index].hidden = false;
-    previousBeat = index;
+  function seek() {
+    if (!active || !inView || video.error || video.readyState < 1 || video.seeking) return;
+    const time = Math.min(displayedTime, video.duration - .045);
+    if (Math.abs(video.currentTime - time) > .038) video.currentTime = time;
   }
 
-  function paintFallback(progress) {
-    const position = progress*(frames.length-1);
-    const index = Math.floor(position);
-    const fraction = clamp(position-index);
-    const frame = frames[index];
-    const nextFrame = frames[index+1];
-    if (frame.dataset.src && !frame.hasAttribute('src')) frame.src = frame.dataset.src;
-    if (fraction>0 && nextFrame?.dataset.src && !nextFrame.hasAttribute('src')) nextFrame.src = nextFrame.dataset.src;
-    const shownIndex = frame.naturalWidth ? index : heldIndex;
-    const mix = nextFrame?.naturalWidth && shownIndex===index ? fraction : 0;
-    frames.forEach((frame,i)=>{
-      const isNext = i===index+1 && mix>0;
-      frame.style.opacity = i===shownIndex ? '1' : isNext ? String(mix*mix*(3-2*mix)) : '0';
-      frame.style.zIndex = isNext ? '2' : '1';
+  function paint(timestamp) {
+    frame = 0;
+    const elapsed = lastTime ? Math.min(timestamp - lastTime, 40) : 16;
+    const distance = targetTime - displayedTime;
+    displayedTime = Math.abs(distance) < .023 ? targetTime : displayedTime + distance * (1 - Math.exp(-elapsed / 75));
+    seek();
+    lastTime = timestamp;
+    if (displayedTime !== targetTime) frame = requestAnimationFrame(paint);
+    else lastTime = 0;
+  }
+
+  function track() {
+    if (!active || !inView) return;
+    const line = portrait.matches ? backdrop.offsetHeight + (innerHeight - backdrop.offsetHeight) * .49 : innerHeight * .52;
+    const position = line - run.getBoundingClientRect().top;
+    let stageIndex = 0;
+    while (stages[stageIndex + 1]?.element.offsetTop <= position) stageIndex++;
+    const stage = stages[stageIndex];
+    const progress = clampProgress((position - stage.element.offsetTop) / stage.element.offsetHeight);
+    if (current !== stageIndex) {
+      stages[current].element.removeAttribute('data-current');
+      stage.element.setAttribute('data-current', '');
+      current = stageIndex;
+    }
+    stages.forEach(({ path }, index) => {
+      path.style.strokeDashoffset = index < stageIndex ? '0' : index === stageIndex ? String(1 - progress) : '1';
     });
-    heldIndex = mix>=.5 ? index+1 : shownIndex;
+    const endTime = stages[stageIndex + 1]?.time ?? (video.duration || 18.8);
+    targetTime = stage.time + (endTime - stage.time) * progress;
+    if (!frame) frame = requestAnimationFrame(paint);
   }
 
-  function desiredTime() {
-    return displayed * Math.max(0,video.duration-0.045);
+  function load() {
+    if (!active || sourcesLoaded) return;
+    sourcesLoaded = true;
+    video.preload = 'auto';
+    video.src = portrait.matches ? video.dataset.videoSmall : video.dataset.videoSrc;
   }
 
-  function seekVideo() {
-    if (!wantsVideo || reduced.matches || videoFailed || video.readyState<2 || video.seeking || !Number.isFinite(video.duration)) return;
-    const time = desiredTime();
-    if (Math.abs(video.currentTime-time)>.045) video.currentTime = time;
-    else video.classList.add('is-visible');
+  function configure() {
+    active = !motionPreference.matches && Boolean(video.canPlayType('video/mp4'));
+    run.classList.toggle('has-motion', active);
+    if (active && inView) load();
+    if (active) track();
+    else {
+      cancelAnimationFrame(frame);
+      frame = 0;
+      lastTime = 0;
+      if (sourcesLoaded) {
+        video.removeAttribute('src');
+        video.load();
+        sourcesLoaded = false;
+        displayedTime = 0;
+      }
+    }
   }
 
-  function paint(time) {
-    pending=0;
-    const interval=lastTime?Math.min(time-lastTime,32):16;
-    const remaining=requested-displayed;
-    displayed=Math.abs(remaining)<.002?requested:displayed+remaining*(1-Math.exp(-interval/52));
-    lastTime=time;
-    showBeat(displayed);
-    if (!video.classList.contains('is-visible')) paintFallback(displayed);
-    seekVideo();
-    if(displayed!==requested) pending=requestAnimationFrame(paint);
-    else lastTime=0;
-  }
+  const observer = new IntersectionObserver(([entry]) => {
+    inView = entry.isIntersecting;
+    if (inView) {
+      load();
+      track();
+    }
+  }, { rootMargin: '100px 0px' });
+  observer.observe(run);
 
-  function trackScroll() {
-    if(reduced.matches) return;
-    const travel=run.offsetHeight-backdrop.offsetHeight;
-    if(travel<=0) return;
-    const rect=run.getBoundingClientRect();
-    if(scrollY>0 && rect.top<innerHeight-30 && rect.bottom>0) loadVideo();
-    requested=clamp(-rect.top/travel);
-    if(!pending) pending=requestAnimationFrame(paint);
-  }
-
-  function loadVideo() {
-    if (reduced.matches || wantsVideo || !video.canPlayType('video/mp4')) return;
-    wantsVideo=true;
-    video.preload='auto';
-    video.src=video.dataset.videoSrc;
-    video.load();
-  }
-
-  function applyMode() {
-    cancelAnimationFrame(pending);
-    pending=0;
-    lastTime=0;
-    story.classList.toggle('is-enhanced',!reduced.matches);
-    backdrop.hidden=reduced.matches;
-    trackScroll();
-  }
-
-  video.addEventListener('loadeddata',seekVideo);
-  video.addEventListener('seeked',seekVideo);
-  video.addEventListener('error',()=>{
-    videoFailed=true;
-    video.classList.remove('is-visible');
-    trackScroll();
-  });
-  frames.forEach(frame=>frame.addEventListener('load',trackScroll,{once:true}));
-  addEventListener('scroll',trackScroll,{passive:true});
-  addEventListener('resize',trackScroll);
-  reduced.addEventListener('change',applyMode);
-  applyMode();
+  video.addEventListener('loadedmetadata', track);
+  video.addEventListener('seeked', seek);
+  addEventListener('scroll', track, { passive: true });
+  addEventListener('resize', track);
+  motionPreference.addEventListener('change', configure);
+  configure();
 }

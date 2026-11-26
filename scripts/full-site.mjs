@@ -44,39 +44,42 @@ const book = [
 const entries = [];
 const add = (file,title,description,body,{script='',indexable=true}={}) => entries.push({file,title,description,body,script,indexable});
 const e = (name) => `assets/editorial/${name}`;
-const chapters = [
-  ['sketch','Эскиз','Сначала — замысел','Увязываем планировку, посадку дома и вид из окон.'],
-  ['slab','Основание','Плита задаёт контур','Готовим основание и заливаем бетон.'],
-  ['first-wall','Первая панель','Ставим первую панель','Кран подаёт первый стеновой элемент на свободное основание.'],
-  ['walls','Стены','Собираем стены','Соседние панели встают по очереди. Под окна и двери остаются проёмы.'],
-  ['first-roof','Перекрытие','Монтируем плиты перекрытия','Кран подаёт первую плиту над открытым коробом. По проекту эта плита входит в конструкцию плоской крыши.'],
-  ['shell','Собранная коробка','Коробка под крышей','Перекрытие смонтировано. Оконные и дверные проёмы пока открыты.'],
-  ['glazing','Окна','Устанавливаем остекление','Окна и вход уже на месте. Наружная отделка ещё впереди.'],
-  ['cladding','Отделка','Отделываем фасад','На фасаде появляются деревянные панели и светлая отделка.'],
-  ['facade','Флагман','Флагман · Дом 89','Три спальни и 80,1 м² внутри. Посмотрите план или подберите комплектацию для своего участка.'],
+const buildFilm = e('build-route.mp4?v=1');
+const buildStages = [
+  ['Дом 89',0,'Свой дом в предгорьях','Три спальни, кухня-гостиная 29,2 м² и выход во двор. Так выглядит Дом 89 в одном из вариантов отделки.','80,1 м² полезной площади','projects/dom-89/#floor-plan','Посмотреть план дома'],
+  ['Участок',2.6,'Выбираем место для дома','Смотрим, где будут свет, вид из окон и удобный вход. До покупки участка проверяем подъезд крана, рельеф и расстояние до сетей.','Посадка дома, въезд и будущая терраса','land/search/','Подобрать участок'],
+  ['Фундамент',5,'Заливаем плиту','Сначала увязываем основание с грунтом и планировкой. Вводы воды и канализации размещаем заранее, чтобы они вышли там, где запланированы кухня и санузлы.','Основание под конкретный участок','construction/','Как готовим основание'],
+  ['Монтаж',7.2,'Собираем стены и перекрытие','Панели с готовыми проёмами изготавливают на заводе по раскладке. На площадке кран последовательно ставит стеновые элементы, затем монтируем несколько плит перекрытия.','Наружная панель: бетон, утеплитель, бетон','technology/','Посмотреть устройство панели'],
+  ['Остекление',11.3,'Закрываем дом от погоды','В готовые проёмы устанавливаем окна и наружные двери. Дальше можно переходить к инженерии и внутренним работам по выбранной комплектации.','Высота и ширина окон заданы в проекте','equipment/','Сравнить комплектации'],
+  ['Фасад',13.4,'Отделываем фасад','У Дома 89 светлые плоскости фасада сочетаются с вертикальной облицовкой под дерево. Образцы покрытия и цвет обсуждаем до закупки.','Отделка и её состав фиксируются в смете','architecture/open-life/','Посмотреть Open Life'],
+  ['Двор',15.8,'Доводим участок до жизни','Планируем дорожку от калитки, место для террасы и посадок. Озеленение, ограждение и освещение двора можно включить в отдельный этап.','Благоустройство рассчитывается по участку','quiz/?model=89','Хочу такой дом'],
 ];
-const buildImage = key => key==='facade'?'assets/house89-daylight-1100.webp':e('build-'+key+'.webp');
-const storyBeats = [
-  ['Участок','Дом начинается с места','Проверим, куда поставить дом, как заедет техника и что нужно учесть при подключении сетей.','land/search/','Поможем подобрать участок'],
-  ['Проект','Согласуем план до стройки','Планировка, проёмы и состав комплектации определяются заранее. На участке готовим основание под проект.','projects/dom-89/','Посмотреть планировку'],
-  ['Заводские панели','Коробка собирается на участке','Панели с готовыми проёмами и плиты перекрытия делают на заводе по размерам проекта. На участке остаётся собрать их краном.','technology/','Как устроены панели'],
-  ['Отделка','От коробки до готового фасада','Для Дома 89 показали дерево и светлый фасад. Отделку, окна и состав работ согласуем до сметы.','equipment/','Сравнить комплектации'],
-  ['Дом 89','Ваш дом может быть следующим','Три спальни и 80,1 м² внутри. Примерьте проект к участку и передайте параметры для расчёта.','quiz/?model=89','Хочу такой дом'],
-];
-const scene = `<section class="build-story" id="stages" aria-label="Как строится Дом 89">
-  <div class="build-run"><div class="build-backdrop" hidden>
-    <div class="build-visual">
-    ${chapters.map(([key],i)=>`<img class="build-frame" data-build-frame="${key}" ${i===0?'src':'data-src'}="${buildImage(key)}" alt="" ${i===0?'style="opacity:1"':''} loading="lazy" fetchpriority="low" decoding="async">`).join('')}
-    <video class="build-video" data-video-src="assets/editorial/build-scroll.mp4?v=2" preload="none" muted playsinline aria-hidden="true"></video>
+const roadShape = 'M48 0C48 12 85 14 85 26S48 42 48 50 12 64 12 76 48 88 48 100';
+const scene = `<section class="build-story" id="stages" aria-label="Маршрут строительства Дома 89">
+  <div class="build-run">
+    <div class="build-backdrop">
+      <div class="build-visual">
+        <video class="build-video" data-video-src="${buildFilm}" data-video-small="${e('build-route-compact.mp4?v=1')}" poster="assets/house89-daylight-1100.webp" preload="none" muted playsinline disablepictureinpicture aria-hidden="true"></video>
+      </div>
+      <span class="build-film-credit">Дом 89 · проектная визуализация</span>
     </div>
-    <div class="build-caption">${storyBeats.map(([label,title,copy,url,cta],i)=>`<div data-build-beat${i?' hidden':''}><p class="tag">${label}</p><h2>${title}</h2><p>${copy}</p>${action(url,cta)}</div>`).join('')}</div>
-  </div>
-  <div class="build-chapters">${chapters.map(([key,label,title,copy])=>`<figure class="build-chapter">
-    <img src="${buildImage(key)}" alt="${title}" loading="lazy" decoding="async" width="768" height="512">
-    <figcaption><strong>${label}.</strong> ${copy}</figcaption>
-  </figure>`).join('')}</div></div>
-  <div class="build-end"><div><h2>Дом 89</h2><p>Три спальни и 80,1 м² внутри. Этапы строительства показаны на иллюстрациях.</p></div>
-    <div class="buttons">${action('quiz/?model=89','Хочу такой дом')}<a href="projects/dom-89/">План дома</a><a href="assets/editorial/build-preview.mp4?v=9">Смотреть ролик</a></div>
+    <div class="build-steps">
+      ${buildStages.map(([label,time,title,copy,detail,url,cta],i)=>`<article class="build-step" data-stage-time="${time}"${i===0?' data-current':''}>
+        <svg class="build-road" viewBox="0 0 96 100" preserveAspectRatio="none" aria-hidden="true">
+          <path class="build-road-edge" d="${roadShape}"/>
+          <path class="build-road-center" d="${roadShape}"/>
+          <path class="build-road-progress" d="${roadShape}" pathLength="1"/>
+        </svg>
+        <span class="build-station" aria-hidden="true"></span>
+        <div class="build-step-copy">
+          <p class="tag">${label}</p>
+          <h2>${title}</h2>
+          <p>${copy}</p>
+          <p class="build-detail">${detail}</p>
+          ${action(url,cta,i===buildStages.length-1?'primary':'outline')}
+        </div>
+      </article>`).join('')}
+    </div>
   </div>
 </section>`;
 const technical = `<div class="spec-strip"><div><strong>230 мм</strong><span>Наружная стена</span></div><div><strong>120 мм</strong><span>Перегородка</span></div><div><strong>350 мм</strong><span>Панель покрытия</span></div></div><p>Толщина типовых изделий. Состав, узлы и опирание уточняются по проекту.</p>${grid([
@@ -156,7 +159,7 @@ add('projects/index.html','Проекты домов','Планировки и �
 for(const [id,h] of Object.entries(assets)) {
   add(`projects/dom-${id}/index.html`,`Дом ${id}`,h.desc,lead('Проект дома',`Дом ${id}`,`${h.area} м² внутри. ${h.desc}`,action(`quiz/?model=${id}`,'Рассчитать для участка'))+
     `<div class="wide-media">${image('assets/'+h.photo,'Фасадный визуал из архива проекта',true)}</div>`+
-    section('Планировка',`<div class="project-plan"><a class="plan" href="assets/${h.plan}">${image('assets/'+h.plan,`Планировка Дома ${id} из КП`)}</a><div class="plan-copy"><p class="tag">План из КП</p><h3>${h.area} м² внутри</h3><p>${h.desc}</p><p>${id} м² — наружный габарит проекта.</p>${action(`quiz/?model=${id}`,'Подобрать комплектацию')}</div></div>`)+
+    section('Планировка',`<div class="project-plan"${id==='89'?' id="floor-plan"':''}><a class="plan" href="assets/${h.plan}">${image('assets/'+h.plan,`Планировка Дома ${id} из КП`)}</a><div class="plan-copy"><p class="tag">План из КП</p><h3>${h.area} м² внутри</h3><p>${h.desc}</p><p>${id} м² — наружный габарит проекта.</p>${action(`quiz/?model=${id}`,'Подобрать комплектацию')}</div></div>`)+
     section('От комплекта до отделки',`<p>Согласуйте состав готовности, инженерию и доплаты по участку.</p>${action(`equipment/?model=${id}#package-tool`,'Сравнить комплектации')} ${action(`mortgage/dom-${id}/`,'Рассчитать ипотеку')}`)+
     section('Как проходит стройка',`<p>Сначала проверяем участок и условия монтажа. Затем согласуем проект, состав работ и график.</p>${action('construction/','Посмотреть этапы')}`)+(id==='89'?scene:''),{script:id==='89'?'build-scene.js':''});
 }
@@ -308,10 +311,10 @@ export function buildFullSite({write,seo,escape}) {
     const hasBuildStory = isHome || here==='projects/dom-89/';
     const menu = [['objects/','Наши дома'],['dohodnye-doma/','Доходные дома'],['gostevye-doma/','Гостевые дома'],['architecture/','Архитектура'],['land/','Участки'],['invest/','Инвестору'],['calculator/','Калькулятор']];
     const links = menu.map(([url,name])=>`<a href="${url}"${here===url?' aria-current="page"':''}>${name}</a>`).join('');
-    const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><base href="${base}"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)} · Дом за лето</title><meta name="description" content="${escape(description)}"><meta name="theme-color" content="#24372e"><link rel="icon" href="assets/logo.webp"><link rel="stylesheet" href="full-site.css?v=layout2"><link rel="stylesheet" href="crimea.css?v=${hasBuildStory?2:1}">${isHome?'<link rel="stylesheet" href="flagship.css?v=3">':''}${seo(file,title,description,here.startsWith('journal/')&&here!=='journal/')}</head><body>
+    const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><base href="${base}"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)} · Дом за лето</title><meta name="description" content="${escape(description)}"><meta name="theme-color" content="#24372e"><link rel="icon" href="assets/logo.webp"><link rel="stylesheet" href="full-site.css?v=layout2"><link rel="stylesheet" href="crimea.css?v=${hasBuildStory?3:1}">${isHome?'<link rel="stylesheet" href="flagship.css?v=3">':''}${seo(file,title,description,here.startsWith('journal/')&&here!=='journal/')}</head><body>
     <header class="top"><a class="brand" href="./"><img src="assets/logo.webp" alt="Дом за лето · Главная" width="398" height="200"></a><nav aria-label="Меню сайта">${links}</nav><div class="top-actions"><div class="top-contact"><a class="top-phone" href="tel:+79787245424">+7 978 724-54-24</a><a href="contacts/"${here==='contacts/'?' aria-current="page"':''}>Контакты</a></div><a class="top-cta" href="quiz/">Выбрать свой дом<span class="action-arrow" aria-hidden="true">↗</span></a></div></header>
     <main>${body}</main>
-    <footer class="foot"><div class="foot-brand"><a class="brand" href="./">${image('assets/logo.webp','')}<b>Дом за лето</b></a><p>Частные, доходные и гостевые дома в Крыму</p><a href="tel:+79787245424">+7 978 724-54-24</a></div><nav aria-label="Разделы">${links}<a href="contacts/">Контакты</a><a href="projects/">Каталог проектов</a><a href="production/">Производство</a><a href="technology/">Технология</a><a href="construction/">Как строим</a><a href="equipment/">Комплектации</a><a href="configure/">Конфигуратор</a></nav><div class="foot-bottom"><span>Дом за лето · Крым · 2026</span><span>Стоимость и состав работ подтверждаются по проекту и участку.</span></div></footer>${[].concat(script).filter(Boolean).map(file=>`<script src="${file}?v=${file==='build-scene.js'||file==='flagship.js'?'scroll3':'crimea1'}" defer></script>`).join('')}</body></html>`;
+    <footer class="foot"><div class="foot-brand"><a class="brand" href="./">${image('assets/logo.webp','')}<b>Дом за лето</b></a><p>Частные, доходные и гостевые дома в Крыму</p><a href="tel:+79787245424">+7 978 724-54-24</a></div><nav aria-label="Разделы">${links}<a href="contacts/">Контакты</a><a href="projects/">Каталог проектов</a><a href="production/">Производство</a><a href="technology/">Технология</a><a href="construction/">Как строим</a><a href="equipment/">Комплектации</a><a href="configure/">Конфигуратор</a></nav><div class="foot-bottom"><span>Дом за лето · Крым · 2026</span><span>Стоимость и состав работ подтверждаются по проекту и участку.</span></div></footer>${[].concat(script).filter(Boolean).map(file=>`<script src="${file}?v=${file==='build-scene.js'?'route1':file==='flagship.js'?'scroll3':'crimea1'}" defer></script>`).join('')}</body></html>`;
     write(file, html.replace(/(<a [^>]*?)href="(\.\/|[a-z0-9-]+(?:\/[a-z0-9-]+)*\/)((?:[?#][^"]*)?)"/g, '$1href="$2index.html$3"'));
   }
   return entries.map(({file})=>file.replace(/index.html$/,''));
