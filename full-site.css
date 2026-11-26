@@ -220,3 +220,10 @@ h1,h2,h3,.spec-strip strong,.tool legend{font-family:var(--display);font-weight:
 .project-grid .tile>img{width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:center}
 .project-grid .tile>div{padding:.95rem 0 1.1rem}
 @media(max-width:740px){.project-grid{grid-template-columns:1fr}}
+.estimate-callout{display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr);align-items:start}
+.estimate-callout h2{margin-bottom:.42rem}
+.estimate-callout>div p:not(.tag){max-width:35ch;margin-bottom:1rem}
+.estimate-callout .tool{width:100%;max-width:none}
+.estimate-callout .tool .sales-points{grid-template-columns:repeat(auto-fit,minmax(min(10.5rem,100%),1fr))}
+.estimate-callout .tool output{margin:.3rem 0}
+@media(max-width:740px){.estimate-callout{grid-template-columns:1fr}}
