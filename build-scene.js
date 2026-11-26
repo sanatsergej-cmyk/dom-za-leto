@@ -28,8 +28,11 @@ for (const story of document.querySelectorAll('.build-story')) {
     const position = progress*(frames.length-1);
     const index = Math.floor(position);
     const fraction = clamp(position-index);
+    const frame = frames[index];
     const nextFrame = frames[index+1];
-    const shownIndex = frames[index].naturalWidth ? index : heldIndex;
+    if (frame.dataset.src && !frame.hasAttribute('src')) frame.src = frame.dataset.src;
+    if (fraction>0 && nextFrame?.dataset.src && !nextFrame.hasAttribute('src')) nextFrame.src = nextFrame.dataset.src;
+    const shownIndex = frame.naturalWidth ? index : heldIndex;
     const mix = nextFrame?.naturalWidth && shownIndex===index ? fraction : 0;
     frames.forEach((frame,i)=>{
       const isNext = i===index+1 && mix>0;
